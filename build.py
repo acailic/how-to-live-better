@@ -189,6 +189,9 @@ LANGS = {
         "btn_all": "All",
         "btn_a": "Grade A only",
         "btn_plain": "Plain terms only",
+        # optional: which evidence-grade filter the page opens with
+        # ('all' everywhere by default; the English page ships with 'A')
+        "filter_init": "A",
         "btn_theme": "Theme",
         "theme_aria": "Toggle light/dark theme",
         "jump_aria": "Jump to a section",
@@ -923,10 +926,13 @@ def count_line(spec, shown, total):
     return c[i].replace("%1", str(shown)).replace("%2", str(total))
 
 
-def page_js(count_fmt):
+def page_js(count_fmt, filter_init="all"):
     """Identical page logic for every language; only the count-line format
     string (or its plural forms) is localized (injected as the L10N
-    constant). The cstr rules mirror count_line() — keep them in sync."""
+    constant). A non-default filter_init appends one setMode() call so the
+    page opens with that filter active (EN ships with Grade A preselected);
+    the default leaves the emitted JS byte-identical to before. The cstr
+    rules mirror count_line() — keep them in sync."""
     forms = json.dumps(count_fmt, ensure_ascii=False)
     if isinstance(count_fmt, str):
         l10n = "const L10N={count:%s};\nconst cstr=n=>L10N.count;\n" % forms
@@ -936,7 +942,9 @@ def page_js(count_fmt):
         l10n = ("const L10N={count:%s};\n"
                 "const cstr=n=>{const m=n%%10,u=n%%100;"
                 "return L10N.count[(m===1&&u!==11)?0:(m>=2&&m<=4&&(u<12||u>14))?1:2];};\n" % forms)
-    return l10n + JS_CORE + LANGS_JS
+    init = ("" if filter_init == "all"
+            else "setMode(%s);\n" % json.dumps(filter_init, ensure_ascii=False))
+    return l10n + JS_CORE + LANGS_JS + init
 
 
 def render_entry(e, sec_no, spec, parse_tags):
@@ -1092,7 +1100,7 @@ def build_lang(lang, sections, out=None, built=None):
              % ("".join(sec_toc), "".join(sec_html), html.escape(spec["empty"]), footer,
                 html.escape(spec["top_title"]), html.escape(spec["top_title"])))
 
-    out_html = head + bar + shell + "<script>" + page_js(spec["count_js"]) + "</script></body></html>"
+    out_html = head + bar + shell + "<script>" + page_js(spec["count_js"], spec.get("filter_init", "all")) + "</script></body></html>"
 
     if out:
         name = Path(out)
