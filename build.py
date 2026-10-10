@@ -517,6 +517,10 @@ def link_count(s):
 
 # ---------------------------------------------------------------- rendering
 
+# Inline SVG favicon (sprout + sun) so every page stays a single, offline-readable file.
+FAVICON = '<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 64 64\'%3E%3Cdefs%3E%3ClinearGradient id=\'g\' x1=\'0\' y1=\'0\' x2=\'1\' y2=\'1\'%3E%3Cstop offset=\'0\' stop-color=\'%234a6be0\'/%3E%3Cstop offset=\'1\' stop-color=\'%232c3f96\'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=\'64\' height=\'64\' rx=\'15\' fill=\'url(%23g)\'/%3E%3Ccircle cx=\'47\' cy=\'17\' r=\'6\' fill=\'%23f9b44e\'/%3E%3Cpath d=\'M32 54V31\' stroke=\'%23fff\' stroke-width=\'5\' stroke-linecap=\'round\' fill=\'none\'/%3E%3Cpath d=\'M32 34C32 23 25 17 13 17c0 11 7 17 19 17z\' fill=\'%23fff\'/%3E%3Cpath d=\'M32 40c0-9 6-14 16-14 0 9-6 14-16 14z\' fill=\'%23c3d0ff\'/%3E%3C/svg%3E">'
+
+
 CSS = r"""
 *,*::before,*::after{box-sizing:border-box}
 :root{
@@ -993,9 +997,9 @@ def build_lang(lang, sections, out=None, built=None):
             '<meta name="color-scheme" content="light dark">'
             '<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">'
             '<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1b1b1f">'
-            '<meta name="description" content="%s">'
+            '<meta name="description" content="%s">%s'
             '<title>%s · %s</title><style>%s</style></head><body>'
-            % (spec["html_lang"], html.escape(spec["meta_desc"] % (scope, total), quote=True),
+            % (spec["html_lang"], html.escape(spec["meta_desc"] % (scope, total), quote=True), FAVICON,
                html.escape(spec["book_title"]), html.escape(scope), CSS))
 
     bar = ('<header class="bar"><h1>%s<small>%s</small></h1>'
@@ -1106,7 +1110,7 @@ def build_landing(built, entry_total, section_total):
             '<meta name="description" content="How to Live Better (《高性价比人生指南》) — '
             'a cost-effectiveness guide to life. %d sections, %d recommendations, each with costs, '
             'benefits, an evidence grade (A/B/C) and links to the research. Multiple languages, '
-            'single-file pages, readable offline.">'
+            'single-file pages, readable offline.">%s'
             '<title>How to Live Better · 高性价比人生指南</title>'
             '<style>%s</style></head><body><main>'
             '<h1>How to Live Better<span lang="zh">高性价比人生指南</span></h1>'
@@ -1123,7 +1127,7 @@ def build_landing(built, entry_total, section_total):
             'for(var i=0;i<p.length;i++){var q=(p[i]||\'\').toLowerCase().split(\'-\')[0];'
             'if(LANGS.indexOf(q)>=0)return go(q);}}catch(e){}go(\'en\');})();</script>'
             '</body></html>'
-            % (section_total, entry_total, LANDING_CSS, section_total, entry_total,
+            % (section_total, entry_total, FAVICON, LANDING_CSS, section_total, entry_total,
                "".join(items), foot, codes))
     (HERE / "index.html").write_text(page, encoding="utf-8")
     print("[landing] %d languages -> index.html (%d bytes)"
