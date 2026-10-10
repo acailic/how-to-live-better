@@ -1,8 +1,8 @@
 # How to Live Better · 高性价比人生指南 — multilingual reader
 
 Single-file HTML reading pages for the open-content book
-《高性价比人生指南》 ("How to Live Better"), rendered in Chinese and English
-(with German, Russian, and Serbian planned — see TRANSLATING.md).
+《高性价比人生指南》 ("How to Live Better"), rendered in Chinese, English,
+German, Russian, and Serbian (see TRANSLATING.md).
 
 **Read online:** https://acailic.github.io/how-to-live-better/
 (landing auto-redirects to your browser language; every page also links every
@@ -10,6 +10,9 @@ other language in its header).
 
 - [English edition](https://acailic.github.io/how-to-live-better/en/)
 - [中文版](https://acailic.github.io/how-to-live-better/zh/)
+- [Deutsche Ausgabe](https://acailic.github.io/how-to-live-better/de/)
+- [Русская версия](https://acailic.github.io/how-to-live-better/ru/)
+- [Srpsko izdanje](https://acailic.github.io/how-to-live-better/sr/)
 
 ## What this is
 
@@ -59,8 +62,9 @@ content/
   VENDORED.txt            pinned upstream snapshot record
   zh/NN-*.md              vendored Chinese original (byte-identical snapshot)
   en/NN-*.md              English translation
+  de/NN-*.md ru/NN-*.md sr/NN-*.md   German, Russian, Serbian translations
 index.html                landing: language selection + auto-redirect
-zh/index.html en/index.html   generated pages (committed)
+zh/ en/ de/ ru/ sr/ index.html      generated pages (committed)
 GLOSSARY.md               canonical terminology table (all languages)
 TRANSLATING.md            how to translate a new language / refresh the snapshot
 tools/check_translation.py  verifies grade/tag/link/number parity vs zh
