@@ -33,6 +33,7 @@ translations. Each language page is content-complete: all 34 sections and all
 - Card per entry: title, evidence grade (A/B/C), value tier, cost tags
 - The **"In plain terms" highlight block** — the book's signature column, made the most prominent element
 - Full-text search with highlighting, "Grade A only" and "plain terms only" filters
+  (the English page opens with the Grade A filter active)
 - Left TOC with value-tier color dots, scroll-synced
 - Language switcher on every page
 - Mobile: full-width search row, collapsing header, back-to-top
