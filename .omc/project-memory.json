@@ -1,0 +1,139 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1791618890707,
+  "projectRoot": "/home/nistrator/.no-mistakes/worktrees/9a7ce9e09c23/01M4JCXCB78NKDXQXC8ENNAAA7",
+  "techStack": {
+    "languages": [],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "content": {
+      "path": "content",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1791618890704,
+      "keyFiles": [
+        "VENDORED.txt"
+      ]
+    },
+    "de": {
+      "path": "de",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1791618890704,
+      "keyFiles": [
+        "index.html"
+      ]
+    },
+    "en": {
+      "path": "en",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1791618890705,
+      "keyFiles": [
+        "index.html"
+      ]
+    },
+    "licenses": {
+      "path": "licenses",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1791618890706,
+      "keyFiles": [
+        "HowToLiveBetter-CODE-LICENSE.txt",
+        "HowToLiveBetter-CONTENT-LICENSE.txt"
+      ]
+    },
+    "ru": {
+      "path": "ru",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1791618890706,
+      "keyFiles": [
+        "index.html"
+      ]
+    },
+    "sr": {
+      "path": "sr",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1791618890707,
+      "keyFiles": [
+        "index.html"
+      ]
+    },
+    "tools": {
+      "path": "tools",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1791618890707,
+      "keyFiles": [
+        "check_translation.py"
+      ]
+    },
+    "zh": {
+      "path": "zh",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1791618890707,
+      "keyFiles": [
+        "index.html"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "TRANSLATING.md",
+      "accessCount": 11,
+      "lastAccessed": 1791623214095,
+      "type": "file"
+    },
+    {
+      "path": "tools/check_translation.py",
+      "accessCount": 3,
+      "lastAccessed": 1791621483387,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
+      "accessCount": 3,
+      "lastAccessed": 1791622362459,
+      "type": "file"
+    },
+    {
+      "path": "content/VENDORED.txt",
+      "accessCount": 2,
+      "lastAccessed": 1791621402491,
+      "type": "file"
+    },
+    {
+      "path": "GLOSSARY.md",
+      "accessCount": 1,
+      "lastAccessed": 1791619494958,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}
