@@ -277,6 +277,70 @@ LANGS = {
                      "(ohne Rechtevorbehalt); erzeugt von build.py.",
         "foot_translated": "Deutsche Übersetzung durch die Pflegepersonen dieses Repositories, unter CC BY 4.0 angeboten.",
     },
+    "ru": {
+        "label": "Русский",
+        "html_lang": "ru",
+        "book_title": "Как жить лучше",
+        "fields_kw": {"Затраты": "cost", "Простыми словами": "plain", "Польза": "benefit",
+                      "Уровень доказательности": "evidence", "Источники": "source", "Примечание": "note"},
+        "tag_keys": {"деньги": "money", "время": "time", "воля": "will",
+                     "польза": "benefit", "метрика": "metric"},
+        "tag_vals": {
+            "money": {"нет": "none", "мало": "low", "много": "high"},
+            "time": {"мало": "low", "средне": "mid", "много": "high"},
+            "will": {"нет": "no", "немного": "some", "да": "yes"},
+            "benefit": {"большая": "large", "средняя": "mid", "малая": "small"},
+            "metric": {"смертность": "mortality", "деньги": "money",
+                       "время": "time", "свобода": "freedom"},
+        },
+        "disp": {
+            "money": {"none": "нет", "low": "мало", "high": "много"},
+            "time": {"low": "мало", "mid": "средне", "high": "много"},
+            "will": {"no": "нет", "some": "немного", "yes": "да"},
+            "benefit": {"large": "большая", "mid": "средняя", "small": "малая"},
+            "metric": {"mortality": "смертность", "money": "деньги",
+                       "time": "время", "freedom": "свобода"},
+            "tier": {"vhigh": "очень высокая", "high": "высокая", "avg": "средняя"},
+        },
+        "tag_disp": {"money": "Деньги", "time": "Время", "will": "Воля",
+                     "benefit": "Польза", "metric": "Метрика"},
+        "chip_sep": ": ",
+        "grade_fmt": "Уровень %s",
+        "tier_fmt": "Ценность: %s",
+        "toc_clip": 50,
+        "scope_all": "все %d раздела",
+        "scope_sel": "разделы %s",
+        "meta_desc": "«Как жить лучше» (《高性价比人生指南》) — %s, всего %d советов. "
+                     "Для каждого совета указаны затраты, польза, уровень доказательности (A/B/C) "
+                     "и ссылки на первоисточники. Один файл, без внешних зависимостей, можно читать офлайн.",
+        "search_ph": "Искать в заголовках, простых словах, пользе…",
+        "btn_all": "Все",
+        "btn_a": "Только уровень A",
+        "btn_plain": "Только «простыми словами»",
+        "btn_theme": "Тема",
+        "theme_aria": "Переключить светлую и тёмную тему",
+        "jump_aria": "Перейти к разделу",
+        "count_js": "%1 / %2 советов",
+        "empty": "Подходящих записей нет",
+        "top_title": "Наверх",
+        "toc_count": "%d",
+        "src_one": "Источник",
+        "src_many": "Источники (%d)",
+        "langs_aria": "Язык",
+        "foot_source": "Содержание: «Как жить лучше» (《高性价比人生指南》) — "
+                       "<a href=\"%s\" target=\"_blank\" rel=\"noopener\">eternity4719/HowToLiveBetter</a>, "
+                       "лицензия <a href=\"%s\" target=\"_blank\" rel=\"noopener\">CC BY 4.0</a>",
+        "foot_snapshot": "; снимок данных <span style=\"font-family:var(--mono)\">%s</span>%s",
+        "snap_date": " (%s)",
+        "foot_excerpt": "Колонки «Простыми словами» и «Польза» переведены с китайского оригинала; "
+                        "на этой странице %d записей — уровень A: %d, уровень B: %d, уровень C: %d — "
+                        "и %d внешних ссылок на литературу.",
+        "foot_self": "Самодостаточный файл: никакие внешние ресурсы не загружаются (кроме ссылок на "
+                     "литературу внутри текста), поэтому страницу можно читать офлайн. Рендерер страницы — "
+                     "из <a href=\"%s\" target=\"_blank\" rel=\"noopener\">cdyforever/how-to-live-better</a> "
+                     "(без сохранения прав); сгенерировано build.py.",
+        "foot_translated": "Русский перевод — авторы этого репозитория; публикуется по лицензии CC BY 4.0.",
+    },
 }
 
 
