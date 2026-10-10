@@ -415,8 +415,9 @@ LANGS = {
 # pages stay single-file and offline (no emoji flags — they degrade to letter
 # pairs on Windows — and no external images). Each is a few hundred bytes on
 # a 30x20 viewBox; a CSS border in --divider keeps white areas visible in
-# dark mode. The flag is decorative: the text label beside it names the
-# language for screen readers.
+# dark mode. The flag is decorative: the accessible name comes from the
+# link's aria-label (switcher) or the text label beside the flag (landing
+# language cards).
 
 _STAR = ("M0-1 .224-.309 .951-.309 .363.118 .588.809 0 .382 -.588.809"
          " -.363.118 -.951-.309 -.224-.309Z")  # unit 5-point star, point up
@@ -449,8 +450,9 @@ FLAGS = {
 
 
 def flag_svg(code):
-    """Decorative inline flag for a language link; the text label that
-    follows it in the same link carries the language name."""
+    """Decorative inline flag for a language link. The accessible name comes
+    from the link's aria-label (switcher) or the text label rendered beside
+    the flag (landing language cards)."""
     return ('<svg class="fl" viewBox="0 0 30 20" aria-hidden="true" '
             'focusable="false">%s</svg>' % FLAGS[code])
 
@@ -622,10 +624,10 @@ strong{font-weight:600;color:var(--t1)}
 .btn[aria-pressed=true]{background:var(--brand-soft);border-color:var(--brand-1);color:var(--brand-1)}
 .count{font-size:12px;color:var(--t3);white-space:nowrap;font-variant-numeric:tabular-nums}
 .langs{display:flex;align-items:center;gap:0;font-size:12.5px;white-space:nowrap}
-.langs a{display:inline-flex;align-items:center;gap:5px;color:var(--t3);padding:2px 5px;border-radius:6px}
+.langs a{display:inline-flex;align-items:center;color:var(--t3);padding:4px 6px;border-radius:6px}
 .fl{width:16px;height:11px;flex:none;border-radius:2px;border:1px solid var(--divider)}
-.langs a:hover{color:var(--t1);background:var(--bg-mute);text-decoration:none}
-.langs a[aria-current=true]{color:var(--brand-1);font-weight:600}
+.langs a:hover,.langs a:focus{color:var(--t1);background:var(--bg-mute);text-decoration:none;box-shadow:inset 0 -2px 0 var(--t1)}
+.langs a[aria-current=true]{background:var(--brand-soft);box-shadow:inset 0 0 0 2px var(--brand-1)}
 .langs i{font-style:normal;color:var(--divider);margin:0 -1px}
 .jump{display:none;height:30px;max-width:38vw;padding:0 6px;border-radius:8px;border:1px solid var(--divider);
   background:var(--bg-elv);color:var(--t2);font:500 12px/1 var(--font)}
@@ -983,13 +985,17 @@ def render_entry(e, sec_no, spec, parse_tags):
 
 
 def lang_switcher(current, built):
+    """Compact switcher: flag-only links, no visible text; the language's
+    own name lives in each link's aria-label and title tooltip."""
     parts = []
     for code in built:
         spec = LANGS[code]
         cur = ' aria-current="true"' if code == current else ""
-        parts.append('<a href="../%s/index.html" hreflang="%s" data-lang="%s" lang="%s"%s>%s%s</a>'
-                     % (code, spec["html_lang"], code, spec["html_lang"], cur,
-                        flag_svg(code), spec["label"]))
+        label = html.escape(spec["label"])
+        parts.append('<a href="../%s/index.html" hreflang="%s" data-lang="%s" lang="%s" '
+                     'aria-label="%s" title="%s"%s>%s</a>'
+                     % (code, spec["html_lang"], code, spec["html_lang"],
+                        label, label, cur, flag_svg(code)))
     return '<nav class="langs" aria-label="%s">%s</nav>' % (
         html.escape(LANGS[current]["langs_aria"]), "<i> · </i>".join(parts))
 
