@@ -17,7 +17,8 @@ implementations to follow.
 - **`build.py` LANGS** maps a language code to everything the renderer
   needs: which field keywords your `.md` files use, which tag tokens, every
   UI string, and how they display. Adding a language = adding one LANGS
-  entry + a content directory; `python3 build.py` then builds
+  entry + one `FLAGS` entry (the switcher/landing flag SVG; `build.py`
+  fails without it) + a content directory; `python3 build.py` then builds
   `<lang>/index.html` automatically and lists the language in the landing
   page and the switcher.
 - **Canonical values are English internally**: `money=low`, `benefit=large`,
@@ -126,7 +127,7 @@ Serbian; see `count_line` in build.py), footer attribution (keep the upstream + 
 1. `mkdir content/<code>` and copy `content/en/NN-*.md` as structural
    templates (or translate from `content/zh/` directly — recommended for
    meaning fidelity).
-2. Add the LANGS entry; run `python3 build.py --lang <code>` after each section.
+2. Add the LANGS and FLAGS entries; run `python3 build.py --lang <code>` after each section.
 3. Translate section by section; run
    `python3 tools/check_translation.py <code> N` to verify section N before
    moving on.
