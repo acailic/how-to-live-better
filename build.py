@@ -415,8 +415,9 @@ LANGS = {
 # pages stay single-file and offline (no emoji flags — they degrade to letter
 # pairs on Windows — and no external images). Each is a few hundred bytes on
 # a 30x20 viewBox; a CSS border in --divider keeps white areas visible in
-# dark mode. The flag is decorative: the text label beside it names the
-# language for screen readers.
+# dark mode. The flag is decorative: the accessible name comes from the
+# link's aria-label (switcher) or the text label beside the flag (landing
+# language cards).
 
 _STAR = ("M0-1 .224-.309 .951-.309 .363.118 .588.809 0 .382 -.588.809"
          " -.363.118 -.951-.309 -.224-.309Z")  # unit 5-point star, point up
