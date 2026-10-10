@@ -1,9 +1,12 @@
 # TRANSLATING.md — adding a language, refreshing the snapshot
 
 This is the in-repo guide for anyone translating the book into another
-language (German, Russian, and Serbian are planned) and for refreshing the
-vendored snapshot. The English translation (`content/en/`) is the reference
-implementation; follow its structure exactly.
+language and for refreshing the vendored snapshot. The English, German,
+Russian, and Serbian translations all ship complete in this repository
+(34 sections / 676 entries each); the English translation (`content/en/`) is
+the primary reference implementation, with German (`content/de/`), Russian
+(`content/ru/`), and Serbian (`content/sr/`) as further reference
+implementations to follow.
 
 ## How the multilingual build works
 
@@ -18,8 +21,8 @@ implementation; follow its structure exactly.
   `<lang>/index.html` automatically and lists the language in the landing
   page and the switcher.
 - **Canonical values are English internally**: `money=low`, `benefit=large`,
-  `metric=mortality`, value tiers `vhigh/high/average`. The LANGS entry maps
-  *your* file tokens (German `Geld=niedrig`, …) to the canonical ones, and
+  `metric=mortality`, value tiers `vhigh/high/avg`. The LANGS entry maps
+  *your* file tokens (German `Geld=wenig`, …) to the canonical ones, and
   canonical ones to display strings. Never re-derive tiers — the build
   recomputes them from the tags, and `tools/check_translation.py` verifies
   the result matches the Chinese original per entry.
@@ -97,7 +100,7 @@ fields. Digit warnings are advisory — read each one; the common benign causes
 are 万/亿 expansion, Chinese-numeral prose (三成 → 30%), and date formats.
 If a warning is not one of those, you likely dropped or altered a number.
 
-## Suggested LANGS starter for German / Russian / Serbian
+## LANGS starter — as shipped for German / Russian / Serbian
 
 Field keywords (pick natural terms, then map them in `tag_keys`/`fields_kw`):
 
@@ -112,20 +115,23 @@ build fails loudly if a tag token doesn't map.
 
 **UI strings to translate carefully** (all in LANGS): book title, scope
 phrases, search placeholder, the three filter buttons, theme button, empty
-state, count format, footer attribution (keep the upstream + CC BY 4.0 + renderer credits + translation notice), meta description.
-`html_lang` must be set (`de`, `ru`, `sr`).
+state, count format (a single string, or a plural-form list — a 2-form
+`[one, other]` list selected by n == 1 for German, a 3-form
+`[one, few, many]` list with the Slavic 11-14 exception for Russian and
+Serbian; see `count_line` in build.py), footer attribution (keep the upstream + CC BY 4.0 + renderer credits + translation notice), meta description.
+`html_lang` must be set (the shipped entries use `de`, `ru`, `sr`).
 
 ## Workflow checklist for a new language
 
-1. `mkdir content/de` and copy `content/en/NN-*.md` as structural
+1. `mkdir content/<code>` and copy `content/en/NN-*.md` as structural
    templates (or translate from `content/zh/` directly — recommended for
    meaning fidelity).
-2. Add the LANGS entry; run `python3 build.py --lang de` after each section.
+2. Add the LANGS entry; run `python3 build.py --lang <code>` after each section.
 3. Translate section by section; run
-   `python3 tools/check_translation.py de N` to verify section N before
+   `python3 tools/check_translation.py <code> N` to verify section N before
    moving on.
 4. When all 34 sections pass with 0 problems: `python3 build.py` (builds all
-   languages + landing), commit, push — Pages publishes `de/index.html` and
+   languages + landing), commit, push — Pages publishes `<code>/index.html` and
    the switcher/landing pick it up automatically.
 5. Attribution: your footer automatically includes the CC BY 4.0 notice and
    a translation credit; the book title in your language belongs in

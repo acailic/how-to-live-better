@@ -159,9 +159,9 @@ LANGS = {
                      "benefit": "benefit", "metric": "metric"},
         "tag_vals": {
             "money": {"none": "none", "low": "low", "high": "high"},
-            "time": {"low": "low", "medium": "mid", "mid": "mid", "high": "high"},
+            "time": {"low": "low", "medium": "mid", "high": "high"},
             "will": {"no": "no", "some": "some", "yes": "yes"},
-            "benefit": {"large": "large", "medium": "mid", "mid": "mid", "small": "small"},
+            "benefit": {"large": "large", "medium": "mid", "small": "small"},
             "metric": {"mortality": "mortality", "money": "money",
                        "time": "time", "freedom": "freedom"},
         },
@@ -256,7 +256,7 @@ LANGS = {
         "btn_theme": "Hell/Dunkel",
         "theme_aria": "Zwischen hellem und dunklem Design wechseln",
         "jump_aria": "Zu einem Abschnitt springen",
-        "count_js": "%1 / %2 Einträge",
+        "count_js": ["%1 / %2 Eintrag", "%1 / %2 Einträge"],
         "empty": "Keine passenden Einträge",
         "top_title": "Nach oben",
         "toc_count": "%d Einträge",
@@ -320,7 +320,7 @@ LANGS = {
         "btn_theme": "Тема",
         "theme_aria": "Переключить светлую и тёмную тему",
         "jump_aria": "Перейти к разделу",
-        "count_js": "%1 / %2 советов",
+        "count_js": ["%1 / %2 совет", "%1 / %2 совета", "%1 / %2 советов"],
         "empty": "Подходящих записей нет",
         "top_title": "Наверх",
         "toc_count": "%d",
@@ -385,7 +385,7 @@ LANGS = {
         "btn_theme": "Tema",
         "theme_aria": "Prebaci svetlu/tamnu temu",
         "jump_aria": "Skoči na odeljak",
-        "count_js": "%1 / %2 stavki",
+        "count_js": ["%1 / %2 stavka", "%1 / %2 stavke", "%1 / %2 stavki"],
         "empty": "Nema stavki koje odgovaraju pretrazi",
         "top_title": "Nazad na vrh",
         "toc_count": "%d stavki",
@@ -770,7 +770,7 @@ function apply(){
     }
   });
   document.getElementById('empty').classList.toggle('hidden',shown>0);
-  cnt.textContent=L10N.count.replace('%1',shown).replace('%2',cards.length);
+  cnt.textContent=cstr(shown).replace('%1',shown).replace('%2',cards.length);
   if(term) markAll(document.querySelector('main'),term);
   document.querySelectorAll('.toc a').forEach(a=>{
     const el=document.getElementById(a.getAttribute('href').slice(1));
@@ -855,10 +855,36 @@ document.querySelectorAll('.langs a').forEach(a=>{
 """
 
 
+def count_line(spec, shown, total):
+    """Render the localized count line. count_js is either a single format
+    string (zh/en), a 2-form [one, other] list selected by n == 1 (de), or a
+    3-form [one, few, many] list with the Slavic 11-14 exception (ru/sr);
+    the form is selected by the shown count."""
+    c = spec["count_js"]
+    if isinstance(c, str):
+        return c.replace("%1", str(shown)).replace("%2", str(total))
+    if len(c) == 2:
+        i = 0 if shown == 1 else 1
+    else:
+        m, u = shown % 10, shown % 100
+        i = 0 if (m == 1 and u != 11) else (1 if (2 <= m <= 4 and not 12 <= u <= 14) else 2)
+    return c[i].replace("%1", str(shown)).replace("%2", str(total))
+
+
 def page_js(count_fmt):
     """Identical page logic for every language; only the count-line format
-    string is localized (injected as the L10N constant)."""
-    return "const L10N={count:%s};\n" % json.dumps(count_fmt, ensure_ascii=False) + JS_CORE + LANGS_JS
+    string (or its plural forms) is localized (injected as the L10N
+    constant). The cstr rules mirror count_line() — keep them in sync."""
+    forms = json.dumps(count_fmt, ensure_ascii=False)
+    if isinstance(count_fmt, str):
+        l10n = "const L10N={count:%s};\nconst cstr=n=>L10N.count;\n" % forms
+    elif len(count_fmt) == 2:
+        l10n = "const L10N={count:%s};\nconst cstr=n=>L10N.count[n===1?0:1];\n" % forms
+    else:
+        l10n = ("const L10N={count:%s};\n"
+                "const cstr=n=>{const m=n%%10,u=n%%100;"
+                "return L10N.count[(m===1&&u!==11)?0:(m>=2&&m<=4&&(u<12||u>14))?1:2];};\n" % forms)
+    return l10n + JS_CORE + LANGS_JS
 
 
 def render_entry(e, sec_no, spec, parse_tags):
@@ -988,7 +1014,7 @@ def build_lang(lang, sections, out=None, built=None):
                html.escape(spec["jump_aria"]), "".join(jump_opts),
                html.escape(spec["btn_all"]), html.escape(spec["btn_a"]), html.escape(spec["btn_plain"]),
                html.escape(spec["search_ph"], quote=True),
-               html.escape(spec["count_js"].replace("%1", str(total)).replace("%2", str(total))),
+               html.escape(count_line(spec, total, total)),
                lang_switcher(lang, built),
                html.escape(spec["theme_aria"]), html.escape(spec["theme_aria"]),
                html.escape(spec["btn_theme"])))

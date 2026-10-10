@@ -105,6 +105,12 @@
   },
   "hotPaths": [
     {
+      "path": "TRANSLATING.md",
+      "accessCount": 11,
+      "lastAccessed": 1791623214095,
+      "type": "file"
+    },
+    {
       "path": "tools/check_translation.py",
       "accessCount": 3,
       "lastAccessed": 1791621483387,
@@ -112,14 +118,8 @@
     },
     {
       "path": "README.md",
-      "accessCount": 2,
-      "lastAccessed": 1791621386996,
-      "type": "file"
-    },
-    {
-      "path": "TRANSLATING.md",
-      "accessCount": 2,
-      "lastAccessed": 1791621387049,
+      "accessCount": 3,
+      "lastAccessed": 1791622362459,
       "type": "file"
     },
     {

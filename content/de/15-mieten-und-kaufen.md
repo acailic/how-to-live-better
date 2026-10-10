@@ -6,10 +6,10 @@ Kennzahl= Geld. Mieten verliert Geld am leichtesten über Kautionen und Makler; 
 <!-- costs: Geld=0 Zeit=wenig Wille=etwas Nutzen=mittel Kennzahl=Geld -->
 - Kosten: Gratis. Zehn zusätzliche Minuten bei der Unterschrift. Schwer: es vor dem Vermieter anzusprechen.
 - Klartext: Wie viel, wann zurückerstattet, unter was abziehbar — vor der Unterschrift schreiben. Abzugsgründe, die im Vertrag fehlen, können gegen deine Kaution nicht verwendet werden.
-- Nutzen: Die Verwaltungsverordnung ist klar: „Erhebt der Vermieter eine Kaution, soll der Wohnraummietvertrag Kautionshöhe, Rückgabezeit und Abzugs­umstände festlegen; jenseits der vertraglich festgelegten Umstände darf der Vermieter nicht ohne gerechtfertigten Grund abziehen.“ Drei Dinge in den Vertrag: Höhe, Rückgabezeit, Abzugsbedingungen. Ungeschriebene Gründe kommen an dein Geld nicht ran
+- Nutzen: Die Verwaltungsverordnung ist klar: „Erhebt der Vermieter eine Kaution, soll der Wohnraummietvertrag Kautionshöhe, Rückgabezeit und Abzugsumstände festlegen; jenseits der vertraglich festgelegten Umstände darf der Vermieter nicht ohne gerechtfertigten Grund abziehen.“ Drei Dinge in den Vertrag: Höhe, Rückgabezeit, Abzugsbedingungen. Ungeschriebene Gründe kommen an dein Geld nicht ran
 - Evidenzgrad: A
 - Quellen: 国务院 (2025). 住房租赁条例（国令第 812 号，2025 年 9 月 15 日施行）（第十条）. <https://www.gov.cn/zhengce/zhengceku/202507/content_7032956.htm>
-- Hinweis: Am Auszugstag mit dem Vermieter gemeinsam fotografieren und video: Zähler, Wände, Böden. Kaution grundlos gekürzt: zuerst bei der Mietverwaltungs­behörde beschweren; kleine Beträge im kleinen Verfahren — Abschnitt 8.
+- Hinweis: Am Auszugstag mit dem Vermieter gemeinsam fotografieren und video: Zähler, Wände, Böden. Kaution grundlos gekürzt: zuerst bei der Mietverwaltungsbehörde beschweren; kleine Beträge im kleinen Verfahren — Abschnitt 8.
 
 ### 2. Wasser oder Strom gekappt, Schlösser getauscht, Klopf-Drohungen: zuerst anzeigen — diese Räumungsmethoden sind verboten
 <!-- costs: Geld=0 Zeit=wenig Wille=nein Nutzen=mittel Kennzahl=Geld -->
@@ -63,7 +63,7 @@ Kennzahl= Geld. Mieten verliert Geld am leichtesten über Kautionen und Makler; 
 - Nutzen: Die Regeln sind klar: Vereinbaren die Parteien, Transaktionsgelder über eine Maklerei zu leiten, sind die Gelder „über das bei einer Bank von der Maklerei eröffnete Sonder-Depositenkonto für Kundentransaktions-Abwicklungsgelder zu transferieren“ — ein betreutes Konto, nicht das der Agentur und nicht das Private einer Vertriebsperson
 - Evidenzgrad: A
 - Quellen: 住房城乡建设部、国家发展改革委、人力资源社会保障部 (2011). 房地产经纪管理办法（令第 8 号，2016 年第 29 号令修改）第二十四条：「房地产交易当事人约定由房地产经纪机构代收代付交易资金的，应当通过房地产经纪机构在银行开设的客户交易结算资金专用存款账户划转交易资金。」第十八条「房地产经纪服务实行明码标价制度……在经营场所醒目位置标明房地产经纪服务项目、服务内容、收费标准」；第十九条「两家或者两家以上房地产经纪机构合作开展同一宗房地产经纪业务的，只能按照一宗业务收取佣金，不得向委托人增加收费」；第十七条代办贷款、代办房地产登记等其他服务「应当向委托人说明服务内容、收费标准等情况，经委托人同意后，另行签订合同」. <http://www.gov.cn/gongbao/content/2011/content_1918920.htm>
-- Hinweis: Hunderttausende bis Millionen — die größte Einzeltransaktion dieses Buchs — nie per WeChat an eine Vertriebsperson. Zwei übliche Überteu­erungen: Gemeinschaftsgeschäfte zweier Agenturen mit zwei Provisionen (eine erlaubt) und Kredit-/Eigentums-Agenturgebühren ohne separaten Vertrag oder Vorab-Offenlegung. Jede Zahlung per Überweisung mit Vermerk — Eintrag 6.
+- Hinweis: Hunderttausende bis Millionen — die größte Einzeltransaktion dieses Buchs — nie per WeChat an eine Vertriebsperson. Zwei übliche Überteuerungen: Gemeinschaftsgeschäfte zweier Agenturen mit zwei Provisionen (eine erlaubt) und Kredit-/Eigentums-Agenturgebühren ohne separaten Vertrag oder Vorab-Offenlegung. Jede Zahlung per Überweisung mit Vermerk — Eintrag 6.
 
 ### 8. Keine Zwischenwände-Zimmer mieten: Kleinste Mieteinheit ist das ursprünglich geplante Zimmer; Küchen, Bäder und Balkone beherbergen niemanden
 <!-- costs: Geld=0 Zeit=wenig Wille=nein Nutzen=mittel Kennzahl=Geld -->

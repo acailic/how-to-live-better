@@ -1,6 +1,6 @@
 # 19. Im Job, aus dem Job und Arbeitsunfälle
 
-Dieser Abschnitt zählt Geld: wie es sich berechnet, was zu unterschreiben ist, wie Fristen laufen. Die ersten drei Einträge decken Geld ab, das während der Beschäftigung fällig ist; sechs decken das Gehen; sieben Berufskrankheit und Arbeitsunfall. Arbeitsunfallgeld läuft eine Größenordnung über Entlassungen, an härteren Fristen — und Berufsschaden kommt nie zurück. Vier Einträge schließen den Abschnitt: Mobbing am Arbeitsplatz, Trennungsbescheinigung, die Einkommensteuer auf Abfindungen und die Übertragung von Sozialversicherungs­beziehungen zwischen Städten.
+Dieser Abschnitt zählt Geld: wie es sich berechnet, was zu unterschreiben ist, wie Fristen laufen. Die ersten drei Einträge decken Geld ab, das während der Beschäftigung fällig ist; sechs decken das Gehen; sieben Berufskrankheit und Arbeitsunfall. Arbeitsunfallgeld läuft eine Größenordnung über Entlassungen, an härteren Fristen — und Berufsschaden kommt nie zurück. Vier Einträge schließen den Abschnitt: Mobbing am Arbeitsplatz, Trennungsbescheinigung, die Einkommensteuer auf Abfindungen und die Übertragung von Sozialversicherungsbeziehungen zwischen Städten.
 
 ### 1. Überstunden 1.5-fach, 2-fach, 3-fach — unbezahlt heißt Arbeitsaufsichts-Beschwerde, verspätete Zahlung plus 50 %–100 %
 <!-- costs: Geld=0 Zeit=wenig Wille=etwas Nutzen=gross Kennzahl=Geld -->
