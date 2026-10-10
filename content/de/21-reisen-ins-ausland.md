@@ -15,7 +15,7 @@ Dieser Abschnitt zählt Geld und persönliche Freiheit, einige Einträge berühr
 <!-- costs: Geld=0 Zeit=wenig Wille=nein Nutzen=mittel Kennzahl=Freiheit -->
 - Kosten: Gratis. Zwei Nummern gespeichert, eine Kopie geschrieben, Minuten.
 - Klartext: Eine Rettungslinie existiert. Inland: 12308. Übersee: +86-10-12308. Die Hotline hat über 3 Millionen Anrufe beantwortet, mit über 500000 Konsularschutz-Fällen im selben Zeitraum.
-- Nutzen: Die globale Konsularschutz-Notfallhotline läuft rund um die Uhr: inland 12308; übersee +86-10-12308 oder +86-10-65612308. Seit 2014 hat sie über 3 Millionen Anrufe entgegengenommen, das Ministerium und die Missionen über 500000 Fälle behandelt
+- Nutzen: Die globale Konsularschutz-Notfallhotline läuft 24 Stunden am Tag: inland 12308; übersee +86-10-12308 oder +86-10-65612308. Seit 2014 hat sie über 3 Millionen Anrufe entgegengenommen, das Ministerium und die Missionen über 500000 Fälle behandelt
 - Evidenzgrad: A
 - Quellen: 外交部、中国驻缅甸使领馆 (2023). 关于当前缅北地区安全局势的领事提醒. <https://cs.mfa.gov.cn/zggmzhw/lsbh/aqtx/202311/t20231109_11176682.shtml>；国务院新闻办 (2023). 国务院政策例行吹风会介绍领事保护与协助有关情况. <https://www.gov.cn/xinwen/2023zccfh/11/index.htm>
 - Hinweis: Die örtliche Mission hält eine eigene Schutzlinie, meist schneller als die Zentrale — auf der Konsular-Seite nach Land nachschlagen und beide speichern. Ein verlorenes oder totes Handy besiegt gespeicherte Nummern: eine Kopie für die Brieftasche oder ein Familienmitglied schreiben.

@@ -86,3 +86,72 @@ tiers are never re-derived — the build recomputes them from the tags.
 - 「……」 quotes → curly quotes “ ”. Keep `**bold**` and escaped `\*` exactly.
 - Never invent, soften, or harden a medical, financial, or legal claim; translate the meaning exactly, including its hedges (约 → about, 可能 → may, 或许 → might).
 - Where the original flags uncertainty ("这个数要打折看"), keep the flag equally visible.
+
+## German (DE)
+
+Terminology actually used in `content/de/`. Register: informal "du" throughout,
+imperative entry titles — matching popular German self-help books.
+
+### Book-level terms
+
+| Chinese | German |
+|---|---|
+| 说人话 | Klartext (field label) |
+| 证据等级 | Evidenzgrad |
+| A 级 / B 级 / C 级 | Stufe A / Stufe B / Stufe C |
+| 性价比 | Preis-Leistung (in Badges: „Preis-Leistung: …") |
+| 成本 / 收益 / 备注 / 来源 | Kosten / Nutzen / Hinweis / Quellen |
+| 口径 | Kennzahl |
+| 打折看 | mit Abschlag lesen |
+| 反面清单 | die Nicht-tun-Liste |
+| 荟萃分析 | Metaanalyse / gepoolte Analyse |
+| 随机对照试验 | randomisierter Versuch (randomisierte kontrollierte Studie) |
+| 队列研究 | Kohortenstudie |
+| 观察性研究 | Beobachtungsstudie |
+| 风险比 / 比值比 / 相对风险 | HR / OR / RR (Abkürzungen behalten; Effekte umgangssprachlich „x-fach") |
+| 95% CI | 95-%-KI (bei erster Nennung: „der Konfidenzbereich") |
+| P 值 | P-Wert |
+| 质量调整生命年 | qualitätsbereinigtes Lebensjahr (QALY) |
+| 全因死亡率 / 总死亡率 | Gesamtmortalität / Gesamtsterblichkeit |
+| 发病率 / 患病率 | Inzidenz / Prävalenz |
+| 黑框警告 | Black-Box-Warnung (FDA) |
+
+### Tags (file tokens)
+
+`<!-- costs: Geld=0 Zeit=wenig Wille=ja Nutzen=gross Kennzahl=Sterblichkeit -->`
+
+| Chinese token | German token |
+|---|---|
+| 钱=0 / 少 / 多 | Geld=0 / wenig / viel |
+| 时间=少 / 中 / 多 | Zeit=wenig / mittel / viel |
+| 毅力=否 / 些 / 是 | Wille=nein / etwas / ja |
+| 收益=大 / 中 / 小 | Nutzen=gross / mittel / klein |
+| 口径=死亡率 / 金钱 / 时间 / 自由 | Kennzahl=Sterblichkeit / Geld / Zeit / Freiheit |
+
+### China-specific terms
+
+| Chinese | German |
+|---|---|
+| 医保 | Grundkrankenversicherung (öffentliches System); „direkt mit Versicherung abrechnen" für 刷医保 |
+| 国家医保局 | Nationale Krankenversicherungsbehörde (NHSA) |
+| 报销 / 报销比例 | Erstattung / Erstattungsquote |
+| 统筹地区 | Versicherungspool-Gebiet |
+| 异地就医备案 | überregionale Behandlungsregistrierung |
+| 社区卫生服务中心 | Gemeinde-Gesundheitszentrum |
+| 三级医院 | Krankenhaus der Stufe 3 |
+| 挂号（费） | (Krankenhaus-)Registrierung(sgebühr) |
+| 城乡居民 / 职工医保 | Einwohner- / Arbeitnehmer-Krankenversicherung |
+| 公积金 | Wohnungs-Bausparfonds (Housing Provident Fund) |
+| 元 / 万元 / 亿元 | Yuan / 10000 Yuan / 100 Millionen Yuan (nie umrechnen) |
+| 学区房 | Schulbezirks-Wohnung |
+| 户口 | Hukou (Haushaltsregistrierung) |
+| 120 / 110 / 119 | Notruf 120 (Rettungsdienst) / 110 (Polizei) / 119 (Feuerwehr) |
+
+### Numbers, dates, quotes (DE rules)
+
+- Decimal point stays a dot (0.58, 2.605.044 nur ab 7 Stellen mit deutschen Tausenderpunkten; bis 6 Stellen ohne Gruppierung: 23407, 610000).
+- Percent with space: „44.7 %". Units with space: „38 °C".
+- Times may switch 12h → 24h where natural (2 p.m. → 14 Uhr), but digits and dates stay digit-for-digit („2026-09-14" bleibt).
+- 「……」 → German quotes „ … "; **bold** und Maskierungen exakt halten.
+- Bezüge: „siehe Abschnitt X, Eintrag Y" (Klartext, kein Link) — im Fließtext kurz „Abschnitt X, Eintrag Y".
+- Medizinische, finanzielle und rechtliche Aussagen nie erfinden, abmildern oder verschärfen; Abschwächungen (约 → etwa, 可能 → kann, womöglich) gleich sichtbar halten.

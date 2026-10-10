@@ -6,7 +6,7 @@ Dieser Abschnitt zählt Geld und Zeit. Wie die Ehe-Buchhaltung von Abschnitt 10 
 <!-- costs: Geld=0 Zeit=wenig Wille=nein Nutzen=gross Kennzahl=Geld -->
 - Kosten: Gratis. Ein Gang zum Haushaltsregistrierungsort des Kindes zum Antrag.
 - Klartext: Kinder geboren ab 2025-01-01, unter 3: dieses Geld zahlt. Ein Elternteil beantragt am Registrierungsort des Kindes. 3600 Yuan pro Kind und Jahr, laufend bis zum 3. Geburtstag — einkommensteuerfrei und nicht als Haushaltseinkommen zählend bei Dibao-artiger Hilfe.
-- Nutzen: Der Zentralplan stating: ab 2025-01-01 geborene Säuglinge, unter 3, „3600 Yuan pro Kind und Jahr“ gezahlt, von einem Elternteil oder anderen Vormund beansprucht — die Beihilfe „von der Einkommensteuer befreit“ und „nicht als Familien- oder Personaleinkommen gezählt“ bei Hilfe-Feststellungen
+- Nutzen: Der Zentralplan besagt: ab 2025-01-01 geborene Säuglinge, unter 3, „3600 Yuan pro Kind und Jahr“ gezahlt, von einem Elternteil oder anderen Vormund beansprucht — die Beihilfe „von der Einkommensteuer befreit“ und „nicht als Familien- oder Personaleinkommen gezählt“ bei Hilfe-Feststellungen
 - Evidenzgrad: A
 - Quellen: 中共中央办公厅、国务院办公厅 (2025). 育儿补贴制度实施方案. <https://www.gov.cn/gongbao/2025/issue_12206/202508/content_7035435.html>
 - Hinweis: Das ist der nationale Boden; manche Provinzen und Städte stapeln lokale Beihilfen obendrauf. Drei Jahre ergeben 10800 Yuan — ein schmaler Anteil der Kinderkosten, keine Grundlage für die Entweder-oder-Entscheidung.

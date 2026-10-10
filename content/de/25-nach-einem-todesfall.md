@@ -89,7 +89,7 @@ Der Bestattungsteil folgt der neuen Bestattungsverordnung, wirksam 2026-03-30. R
 <!-- costs: Geld=0 Zeit=wenig Wille=etwas Nutzen=mittel Kennzahl=Freiheit -->
 - Kosten: Gratis. Unkooperative Plattformen heißen Beschwerde oder Klage.
 - Klartext: Nach dem Tod dürfen nahe Angehörige — für eigene rechtmäßige, legitime Interessen — Plattformen zu Einsehen, Kopieren, Berichtigen oder Löschen der Verstorbenen-Information verlangen. Verweigerungen verlangen benannte Gründe; Gerichte hören die Klagen. Eine Ausnahme: die eigenen Regelungen des Verstorbenen — Konten-Erben oder ausdrückliche Wünsche — regieren stattdessen.
-- Nutzen: Das Gesetz stating es: auf den Tod einer natürlichen Person dürfen nahe Angehörige, für eigene rechtmäßige und legitime Interessen, die Einseh-, Kopier-, Berichtigungs- und Löschrechte des Kapitels über die Verstorbenen-Information ausüben
+- Nutzen: Das Gesetz sagt es: auf den Tod einer natürlichen Person dürfen nahe Angehörige, für eigene rechtmäßige und legitime Interessen, die Einseh-, Kopier-, Berichtigungs- und Löschrechte des Kapitels über die Verstorbenen-Information ausüben
 - Evidenzgrad: A
 - Quellen: 全国人大常委会 (2021). 个人信息保护法. 中国人大网. <http://www.npc.gov.cn/npc/c2/c30834/202108/t20210820_313088.html> 第四十九条：「自然人死亡的，其近亲属为了自身的合法、正当利益，可以对死者的相关个人信息行使本章规定的查阅、复制、更正、删除等权利；死者生前另有安排的除外。」；第五十条「个人信息处理者应当建立便捷的个人行使权利的申请受理和处理机制。拒绝个人行使权利的请求的，应当说明理由」「个人可以依法向人民法院提起诉讼」
 - Hinweis: Die Klausel „außer der Verstorbene traf andere Regelungen“ — Konten-Erben und ausdrückliche Wünsche regieren. Also: solange klar, aufschreiben, wohin Konten und Passwörter gehen, lohnt (Abschnitt 17). Kontolöschung und Informationslöschung sind zwei Dinge (Abschnitt 14).

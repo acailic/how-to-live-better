@@ -2,7 +2,7 @@
 
 Die erste Hälfte zählt Todesrisiko für Mutter und Föt; die zweite Geld und Besorgungszeit — nie ineinander umgerechnet. Der Inhalt deckt nur „was tun wann.“ Pränatale Ernährung und Fetenerziehung ohne harte Belege oder mit winzigen Effekten erscheinen nicht. Mutterschaftszulagen, Urlaub und Kinder-Konten: Abschnitt 18; Neugeborenenpflege: Abschnitt 20; Notfälle: Abschnitt 13.
 
-WHOs Zahlen: 2023 starben weltweit rund 260000 Frauen an Schwangerschaft und Geburt, rund 75 % davon an fünf Ursachen — Nachblutung, Infektion, hypertensive Schwangerschaftserkrankungen (Präeklampsie und Eklampsie eingeschlossen), Geburtskomplikationen und unsicherer Abbruch. Die WHO stating auch: „die meisten Muttertode sind verhinderbar, da die medizinischen Mittel zur Vorbeugung und Handhabung von Komplikationen bekannt sind.“ Die ertragreichsten Einträge dieses Abschnitts fangen exakt diese ab.
+WHOs Zahlen: 2023 starben weltweit rund 260000 Frauen an Schwangerschaft und Geburt, rund 75 % davon an fünf Ursachen — Nachblutung, Infektion, hypertensive Schwangerschaftserkrankungen (Präeklampsie und Eklampsie eingeschlossen), Geburtskomplikationen und unsicherer Abbruch. Die WHO stellt auch klar: „die meisten Muttertode sind verhinderbar, da die medizinischen Mittel zur Vorbeugung und Handhabung von Komplikationen bekannt sind.“ Die ertragreichsten Einträge dieses Abschnitts fangen exakt diese ab.
 
 ### 1. Schwangerschaft planend: täglich 0.4 mg Folsäure beginnen, durch die ersten 3 Monate
 <!-- costs: Geld=0 Zeit=wenig Wille=etwas Nutzen=gross Kennzahl=Sterblichkeit -->
@@ -47,7 +47,7 @@ WHOs Zahlen: 2023 starben weltweit rund 260000 Frauen an Schwangerschaft und Geb
 - Nutzen: USPSTF Stufe B: Hochrisiko-Frauen beginnen nach 12 Wochen niedrig dosiertes Aspirin (81 mg/Tag). Gepoolte Ergebnisse (95-%-KI die Konfidenzbereiche): Präeklampsie RR 0.85 (0.75 bis 0.95, 16 Studien), rund 15 % niedriger; Frühgeburt RR 0.80 (0.67 bis 0.95, 13 Studien), rund 20 %; perinataler Tod RR 0.79 (0.66 bis 0.96, 11 Studien), rund 21 % — perinatal heißt Tod um die Geburt; klein-fürs-Datum/innerer Wachstumsrückstand RR 0.82 (0.68 bis 0.99, 16 Studien), rund 18 %
 - Evidenzgrad: A
 - Quellen: US Preventive Services Task Force (2021). Aspirin Use to Prevent Preeclampsia and Related Morbidity and Mortality: Preventive Medication. <https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/low-dose-aspirin-use-for-the-prevention-of-morbidity-and-mortality-from-preeclampsia-preventive-medication>
-- Hinweis: Hochrisiko-Marker: frühere Präeklampsie, Zwillinge oder mehr, chronischer Bluthochdruck, Typ-1- oder Typ-2-Diabetes vor der Schwangerschaft, Nierenkrankheit und Lupus oder Antiphospholipid-Syndrom. Außerhalb dieser Klassen nicht selbst behandeln. Verschreibung nötig — die Vorgeschichte bei Vorsorgebesuchen stating und die Ärztin urteilen lassen. Inland läuft meist 100-mg-magensaftresistente Tabletten; nach Anweisung.
+- Hinweis: Hochrisiko-Marker: frühere Präeklampsie, Zwillinge oder mehr, chronischer Bluthochdruck, Typ-1- oder Typ-2-Diabetes vor der Schwangerschaft, Nierenkrankheit und Lupus oder Antiphospholipid-Syndrom. Außerhalb dieser Klassen nicht selbst behandeln. Verschreibung nötig — die Vorgeschichte bei Vorsorgebesuchen offen angeben und die Ärztin urteilen lassen. Inland läuft meist 100-mg-magensaftresistente Tabletten; nach Anweisung.
 
 ### 6. Mit 24 Wochen und danach: der Gestationsdiabetes-Screening — den Zuckerdrink nicht auslassen
 <!-- costs: Geld=wenig Zeit=wenig Wille=nein Nutzen=mittel Kennzahl=Sterblichkeit -->
