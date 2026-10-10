@@ -104,7 +104,7 @@ Verfahren, der Körper und einziehbares Geld bei einem Tod: Abschnitt 25. Älter
 - Hinweis: Stufe B, weil Dorf-Stuben und Kreis-Kliniken 2030-Ziele sind, nicht heutige Universal-Fakten; 12356 und 12355 antworten heute. 12356s Stunden: Abschnitt 1, Eintrag 25. Beratung und Psychotherapie unterscheiden sich — Diagnose und Rezepte gehören zu Psychiatern, und Behandlung läuft in lizenzierten Institutionen; stündliches „Heilen“ und „spirituelles Konsultieren“ sitzen außerhalb dieses Systems.
 
 ### 12. Die ersten drei Monate nach dem Schlag: jede unwiderrufliche Entscheidung wartet
-<!-- costs: Geld=0 Zeit=wenig Wille=etwas Nutzen=mittel Kennzahl=Sterblichkeit -->
+<!-- costs: Geld=0 Zeit=wenig Wille=etwas Nutzen=mittel Kennzahl=Geld -->
 - Kosten: Gratis — Warten kann Chancen kosten. Schwer: das Gefühl, dass die Chance nicht wartet.
 - Klartext: Dein Urteil über „Chancen“ steht jetzt am schlechtesten. Wer behauptet, die Toten zu erreichen, dein Geld zu vervielfachen, zu Kündigung und Umzug drängt oder dich als Teilhaber rekrutiert — alle werden anrufen. Alles über ein Monats-Einkommen oder teuer umkehrbar wartet drei Monate. Sprich es zuerst mit jemandem ohne Anteil; nie am selben Tag entscheiden.
 - Nutzen: Vermieden wird: unwiderrufliche Vermögensverfügungen am schlechtesten Urteil — Häuser verkaufen, kündigen, Hinterbliebenen-Zahlungen in Anlagen lump-summen, hastige Wiederverheiratung, fremde Schulden bürgen. Summen laufen typisch Zehntausende bis Haus — daher „mittel.“ Amtliche Dokumente behandeln „familiäre Umbrüche, Arbeitslosigkeit, Abbruch“ gleichermaßen als Krisenrisiken für Gemeinschafts-Erkennung — dieser Zustand ist bereits als einer geflaggt, der fremde Hände braucht
