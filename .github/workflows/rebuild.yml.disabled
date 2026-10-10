@@ -44,3 +44,13 @@ jobs:
           git add index.html
           git commit -m "chore: 按上游 ${UPSTREAM_REV} 重新生成 index.html"
           git push
+
+# ── DISABLED 2026-10 ───────────────────────────────────────────────────────────
+# This repository now contains TRANSLATIONS of the book content, pinned to a
+# vendored snapshot (see content/VENDORED.txt). An automatic rebuild would
+# fetch the latest Chinese upstream and clobber every translation with
+# untranslated Chinese, breaking the multilingual pages.
+#
+# To refresh the content after re-vendoring, see "Refreshing the snapshot"
+# in TRANSLATING.md — it is a manual re-translate workflow, not a rebuild.
+# ───────────────────────────────────────────────────────────────────────────────

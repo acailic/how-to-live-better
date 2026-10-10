@@ -1,57 +1,92 @@
-# 高性价比人生指南 · 在线阅读页
+# How to Live Better · 高性价比人生指南 — multilingual reader
 
-一个单文件 HTML 阅读页，把开源书《高性价比人生指南》的全部 32 节、528 条建议
-渲染成可搜索的页面。手机上打开就能看，不用装任何东西。
+Single-file HTML reading pages for the open-content book
+《高性价比人生指南》 ("How to Live Better"), rendered in Chinese and English
+(with German, Russian, and Serbian planned — see TRANSLATING.md).
 
-**在线阅读：** https://cdyforever.github.io/how-to-live-better/
+**Read online:** https://acailic.github.io/how-to-live-better/
+(landing auto-redirects to your browser language; every page also links every
+other language in its header).
 
-## 这是什么
+- [English edition](https://acailic.github.io/how-to-live-better/en/)
+- [中文版](https://acailic.github.io/how-to-live-better/zh/)
 
-原书由 [eternity4719/HowToLiveBetter](https://github.com/eternity4719/HowToLiveBetter)
-维护（Unlicense，公有领域），按「性价比」排序，每条写清花掉什么、换回什么、证据多硬，
-只引期刊论文和官方文件。
+## What this is
 
-本仓库不是原书的 fork，也不改动原书内容。它只做一件事：把原书正文渲染成一个
-**自包含的单文件网页**，方便在手机和别人的电脑上直接打开。
+The source book is maintained at [eternity4719/HowToLiveBetter](https://github.com/eternity4719/HowToLiveBetter).
+It ranks life decisions by cost-effectiveness: every entry states what it
+costs you, what it gets you, and how strong the evidence is — citing only
+journal papers and official documents.
 
-## 页面特性
+This repository renders that book into **self-contained single-file web
+pages** (one HTML file per language, zero external dependencies, works
+offline), adds a fully localized UI (search, filters, TOC, theme), and adds
+translations. Each language page is content-complete: all 34 sections and all
+676 entries.
 
-- **零外部资源**：没有 CDN、没有字体外链、不 fetch 任何数据，断网也能读
-- 逐条卡片：建议标题、证据等级（A/B/C）、性价比档、成本标签
-- **「说人话」高亮块**——原书里这一栏专门把统计量翻成日常说法，页面上做得最显眼
-- 全站关键词搜索（结果高亮）、只看 A 级、只看说人话
-- 左侧目录带性价比色点，滚动联动
-- 手机端：搜索框独占一行、顶栏向下滚动后自动收成一行、回到顶部按钮
-- 明暗主题切换
-- 支持直接打印
+## Page features
 
-## 本地使用
+- **Zero external resources**: no CDN, no web fonts, no fetches — reads offline
+- Card per entry: title, evidence grade (A/B/C), value tier, cost tags
+- The **"In plain terms" highlight block** — the book's signature column, made the most prominent element
+- Full-text search with highlighting, "Grade A only" and "plain terms only" filters
+- Left TOC with value-tier color dots, scroll-synced
+- Language switcher on every page
+- Mobile: full-width search row, collapsing header, back-to-top
+- Light/dark theme; print-ready
 
-不用构建，双击 `index.html` 即可。
+## License & attribution
 
-## 重新生成
+- **Book content** — © the [eternity4719/HowToLiveBetter](https://github.com/eternity4719/HowToLiveBetter) authors, licensed
+  [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). This repository
+  vendors a **pinned snapshot** (commit `bb25081`, 2026-10-09; see
+  [content/VENDORED.txt](content/VENDORED.txt)). License text copy:
+  [licenses/HowToLiveBetter-CONTENT-LICENSE.txt](licenses/HowToLiveBetter-CONTENT-LICENSE.txt).
+- **Renderer** — the single-file builder (`build.py`) originates from
+  [cdyforever/how-to-live-better](https://github.com/cdyforever/how-to-live-better), which claims no rights
+  reserved. This repository's modifications are likewise released without
+  rights reserved.
+- **Translations** — English, German, Russian, and Serbian translations are
+  produced by this repository and offered under CC BY 4.0 (consistent with
+  the upstream license).
+- Each rendered page carries an equivalent attribution line in its footer.
 
-```bash
-# 需要先有一份上游仓库的本地克隆
-git clone --depth 1 https://github.com/eternity4719/HowToLiveBetter.git /tmp/upstream
+## Repository layout
 
-# 全部 32 节
-python build.py all -o index.html --repo /tmp/upstream
-
-# 只做某几节
-python build.py 1 2 16 --repo /tmp/upstream
+```
+build.py                  i18n-aware single-file renderer (all UI strings per language)
+content/
+  VENDORED.txt            pinned upstream snapshot record
+  zh/NN-*.md              vendored Chinese original (byte-identical snapshot)
+  en/NN-*.md              English translation
+index.html                landing: language selection + auto-redirect
+zh/index.html en/index.html   generated pages (committed)
+GLOSSARY.md               canonical terminology table (all languages)
+TRANSLATING.md            how to translate a new language / refresh the snapshot
+tools/check_translation.py  verifies grade/tag/link/number parity vs zh
 ```
 
-源目录也可以用环境变量 `HLTB_REPO` 指定。
+## Build
 
-统计口径（条目数、A/B/C 分级、性价比三档）与上游的 `tools/sync-stats.ps1`
-和 `index.html` 保持一致，生成结果可与上游徽章逐项对照。
+```bash
+python3 build.py             # all languages + landing page
+python3 build.py --lang en   # one language
+python3 build.py --lang en 1 # one language, one section (dev)
 
-## 自动更新
+python3 tools/check_translation.py en   # parity check vs the Chinese original
+```
 
-`.github/workflows/rebuild.yml` 每天 06:00（北京时间）拉取上游重新生成，
-内容有变化才提交。也可以去 Actions 页面手动触发。
+## Automatic rebuild — deliberately disabled
 
-## 授权
+`.github/workflows/rebuild.yml.disabled` is the original daily auto-rebuild.
+It is disabled because this repository now holds **translations pinned to the
+vendored snapshot**: a rebuild would pull the latest Chinese upstream and
+overwrite every translated page with untranslated Chinese.
 
-原书内容为 Unlicense（公有领域）。本仓库的构建脚本同样不作任何权利保留。
+**How a refresh works instead** (details in [TRANSLATING.md](TRANSLATING.md)):
+
+1. Re-vendor: clone upstream at a new commit, copy `book/*.md` into
+   `content/zh/`, update `content/VENDORED.txt`, rebuild `zh/index.html`.
+2. Diff each language directory against the previous snapshot and re-translate
+   only what changed (`tools/check_translation.py` reports drift).
+3. Translate the diff, rebuild, commit.

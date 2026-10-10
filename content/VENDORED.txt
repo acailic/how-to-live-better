@@ -1,0 +1,16 @@
+Upstream book content is vendored here as a pinned snapshot.
+
+Upstream repo:  https://github.com/eternity4719/HowToLiveBetter
+Commit:        bb25081b423091f9e22059aab6b4ed7343a2266d
+Commit date:   2026-10-09
+Cloned:        pinned at vendor time; NOT a submodule, NOT auto-synced
+Contents:       book/NN-*.md  ->  content/zh/NN-*.md (byte-identical copy)
+
+Licenses (copies under licenses/):
+  - Content: CC BY 4.0  (HowToLiveBetter-CONTENT-LICENSE.txt)
+  - Code:    MIT        (HowToLiveBetter-CODE-LICENSE.txt)
+
+All translations (content/en, content/de, content/ru, content/sr, ...)
+are pinned to this same snapshot. Do not refresh one language without
+refreshing them all — see "Refreshing the snapshot" in TRANSLATING.md
+and README.md.

@@ -1,81 +1,267 @@
 # -*- coding: utf-8 -*-
-"""把《高性价比人生指南》指定的节，渲染成一个自包含的单文件 HTML 阅读页。
+"""Render the multilingual edition of 《高性价比人生指南》 / "How to Live Better"
+into self-contained single-file HTML reading pages.
 
-用法：
-    python build.py                      # 默认第 1、2、16 节
-    python build.py 1 2 16 3             # 指定任意节号（按给定顺序渲染）
-    python build.py all                  # 全部节（用于线上站点）
-    python build.py all -o index.html    # 指定输出文件名
-    python build.py all --repo /path/to/HowToLiveBetter
+Usage:
+    python build.py                     # build every language + the landing page
+    python build.py --lang en           # build one language only
+    python build.py --lang en 1 2 16    # dev: only these sections
+    python build.py --lang en -o out.html
 
-源目录也可用环境变量 HLTB_REPO 覆盖（供 GitHub Actions 使用，优先级低于 --repo）。
-产物默认与脚本同目录，单个 .html，无任何外部依赖，双击即可打开、可离线读。
+Content lives in content/<lang>/NN-*.md. content/zh is a byte-identical pinned
+snapshot of the upstream book (see content/VENDORED.txt); every other language
+directory is a translation pinned to that same snapshot.
 
-数字与标签的口径完全照抄仓库 tools/sync-stats.ps1 与 index.html 的 COST_W / e.ratio：
-仓库改了那两行，这里也要同步改，否则性价比档会和官方检索页对不上。
+Each language is configured in LANGS below: the field keywords and tag tokens
+used in that language's .md files, plus every UI string. Adding a language
+means adding a LANGS entry and a content directory — see TRANSLATING.md.
+
+数字与标签的口径完全照抄上游仓库 tools/sync-stats.ps1 与 index.html 的
+COST_W 与 e.ratio：上游改了那两行，这里也要同步改，否则性价比档会和官方
+检索页对不上。产物为单个 .html，无任何外部依赖，双击即可打开、可离线读。
 """
 
 import argparse
 import html
-import os
+import json
 import re
-import subprocess
-import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-
-
-def parse_args():
-    ap = argparse.ArgumentParser(description="生成《高性价比人生指南》单文件阅读页")
-    ap.add_argument("sections", nargs="*", help="节号；或 all 表示全部节")
-    ap.add_argument("-o", "--out", default=None, help="输出文件名（默认按节号自动命名）")
-    ap.add_argument("--repo", default=None, help="上游仓库目录（默认 D:\\Agent\\HowToLiveBetter）")
-    return ap.parse_args()
-
-
-ARGS = parse_args()
-REPO = Path(ARGS.repo or os.environ.get("HLTB_REPO") or r"D:\Agent\HowToLiveBetter")
-
+CONTENT = HERE / "content"
 UPSTREAM = "https://github.com/eternity4719/HowToLiveBetter"
+RENDERER = "https://github.com/cdyforever/how-to-live-better"
+CC_BY = "https://creativecommons.org/licenses/by/4.0/"
 
 
-def avail_sections():
-    """扫描 book/ 目录，得到实际存在的节号。"""
-    return sorted(int(p.name[:2]) for p in REPO.glob("book/[0-9][0-9]-*.md"))
+# ---------------------------------------------------------------- vendor pin
+
+def load_vendor():
+    """Read the pinned upstream commit recorded at vendor time (content/VENDORED.txt).
+
+    Deliberately a static record instead of a build time or a live clone, so the
+    same source state always rebuilds byte-identically.
+    """
+    rev, date = "", ""
+    try:
+        txt = (CONTENT / "VENDORED.txt").read_text(encoding="utf-8")
+        m = re.search(r"^Commit:\s+(\S+)", txt, re.M)
+        if m:
+            rev = m.group(1)[:7]
+        m = re.search(r"^Commit date:\s+(\S+)", txt, re.M)
+        if m:
+            date = m.group(1)
+    except OSError:
+        pass
+    return rev, date
 
 
-ALL = avail_sections()
-if not ALL:
-    raise SystemExit("在 %s 下找不到 book/NN-*.md，请用 --repo 指定正确的仓库目录" % REPO)
+# ------------------------------------------------------- canonical taxonomy
+# Internal keys are canonical English; LANGS maps them to/from each language's
+# file tokens and display strings. Ratio tiers follow the upstream rules
+# (COST_W + e.ratio in the upstream index.html).
 
-if ARGS.sections:
-    if any(a.lower() == "all" for a in ARGS.sections):
-        SECTIONS = ALL
-    else:
-        SECTIONS = [int(a) for a in ARGS.sections]
-else:
-    SECTIONS = [n for n in (1, 2, 16) if n in ALL]
-
-SCOPE = ("全书 %d 节" % len(ALL)) if SECTIONS == ALL else ("第 %s 节" % "、".join(str(n) for n in SECTIONS))
-
-# 成本权重与档位规则，抄自 index.html 的 COST_W 与 e.ratio 两行
 COST_W = {
-    "钱": {"0": 0, "少": 1, "多": 2},
-    "时间": {"少": 0, "中": 1, "多": 2},
-    "毅力": {"否": 0, "些": 1, "是": 2},
+    "money": {"none": 0, "low": 1, "high": 2},
+    "time": {"low": 0, "mid": 1, "high": 2},
+    "will": {"no": 0, "some": 1, "yes": 2},
 }
-RATIO_ORDER = {"极高": 0, "高": 1, "一般": 2}
+TIER_ORDER = {"vhigh": 0, "high": 1, "avg": 2}
 
 
-def find_file(n):
-    hits = sorted(REPO.glob("book/%02d-*.md" % n))
+def ratio_of(t):
+    try:
+        cs = sum(COST_W[k][t[k]] for k in ("money", "time", "will"))
+    except KeyError:
+        return None
+    b = t.get("benefit")
+    if b == "large":
+        return "vhigh" if cs == 0 else ("high" if cs <= 2 else "avg")
+    if b == "mid" and cs == 0:
+        return "high"
+    return "avg"
+
+
+# ---------------------------------------------------------------- languages
+
+LANGS = {
+    "zh": {
+        "label": "中文",
+        "html_lang": "zh-CN",
+        "book_title": "高性价比人生指南",
+        # keywords used in this language's .md files -> canonical field keys
+        "fields_kw": {"成本": "cost", "说人话": "plain", "收益": "benefit",
+                      "证据等级": "evidence", "来源": "source", "备注": "note"},
+        "tag_keys": {"钱": "money", "时间": "time", "毅力": "will",
+                     "收益": "benefit", "口径": "metric"},
+        "tag_vals": {  # file token -> canonical value
+            "money": {"0": "none", "少": "low", "多": "high"},
+            "time": {"少": "low", "中": "mid", "多": "high"},
+            "will": {"否": "no", "些": "some", "是": "yes"},
+            "benefit": {"大": "large", "中": "mid", "小": "small"},
+            "metric": {"死亡率": "mortality", "金钱": "money",
+                       "时间": "time", "自由": "freedom"},
+        },
+        "disp": {  # canonical value -> display
+            "money": {"none": "0", "low": "少", "high": "多"},
+            "time": {"low": "少", "mid": "中", "high": "多"},
+            "will": {"no": "否", "some": "些", "yes": "是"},
+            "benefit": {"large": "大", "mid": "中", "small": "小"},
+            "metric": {"mortality": "死亡率", "money": "金钱",
+                       "time": "时间", "freedom": "自由"},
+            "tier": {"vhigh": "极高", "high": "高", "avg": "一般"},
+        },
+        "tag_disp": {"money": "钱", "time": "时间", "will": "毅力",
+                     "benefit": "收益", "metric": "口径"},
+        "chip_sep": " ",
+        "grade_fmt": "%s 级",
+        "tier_fmt": "性价比 %s",
+        "toc_clip": 34,
+        # ---- UI strings ----
+        "scope_all": "全书 %d 节",
+        "scope_sel": "第 %s 节",
+        "meta_desc": "《高性价比人生指南》%s，共 %d 条建议，每条标注成本、收益、证据等级（A/B/C）"
+                     "与原始文献链接。单文件、零依赖、可离线阅读。",
+        "search_ph": "搜索标题、说人话、收益…",
+        "btn_all": "全部",
+        "btn_a": "只看 A 级",
+        "btn_plain": "只看说人话",
+        "btn_theme": "明/暗",
+        "theme_aria": "切换明暗主题",
+        "jump_aria": "跳转到某一节",
+        "count_js": "%1 / %2 条",
+        "empty": "没有匹配的条目",
+        "top_title": "回到顶部",
+        "toc_count": "%d 条",
+        "src_one": "来源",
+        "src_many": "来源（%d 条文献）",
+        "langs_aria": "切换语言",
+        # ---- footer ----
+        "foot_source": "数据来源：<a href=\"%s\" target=\"_blank\" rel=\"noopener\">"
+                       "eternity4719/HowToLiveBetter</a>"
+                       "（内容以 <a href=\"%s\" target=\"_blank\" rel=\"noopener\">CC BY 4.0</a> 授权）",
+        "foot_snapshot": "，数据截至 <span style=\"font-family:var(--mono)\">%s</span>%s",
+        "snap_date": "（%s）",
+        "foot_excerpt": "「说人话」「收益」等栏目为原文摘录，未作改写；本页共 %d 条，"
+                        "A 级 %d 条、B 级 %d 条、C 级 %d 条，含 %d 条文献外链。",
+        "foot_self": "单文件自包含，不引用任何外部资源（正文中的文献链接除外），可离线阅读。"
+                     "页面渲染器来自 <a href=\"%s\" target=\"_blank\" rel=\"noopener\">"
+                     "cdyforever/how-to-live-better</a>（不作权利保留）；由 build.py 生成。",
+        "foot_translated": None,  # zh is the original, not a translation
+    },
+    "en": {
+        "label": "English",
+        "html_lang": "en",
+        "book_title": "How to Live Better",
+        "fields_kw": {"Cost": "cost", "In plain terms": "plain", "Benefit": "benefit",
+                      "Evidence grade": "evidence", "Sources": "source", "Note": "note"},
+        "tag_keys": {"money": "money", "time": "time", "will": "will",
+                     "benefit": "benefit", "metric": "metric"},
+        "tag_vals": {
+            "money": {"none": "none", "low": "low", "high": "high"},
+            "time": {"low": "low", "medium": "mid", "mid": "mid", "high": "high"},
+            "will": {"no": "no", "some": "some", "yes": "yes"},
+            "benefit": {"large": "large", "medium": "mid", "mid": "mid", "small": "small"},
+            "metric": {"mortality": "mortality", "money": "money",
+                       "time": "time", "freedom": "freedom"},
+        },
+        "disp": {
+            "money": {"none": "none", "low": "low", "high": "high"},
+            "time": {"low": "low", "mid": "medium", "high": "high"},
+            "will": {"no": "none", "some": "some", "yes": "yes"},
+            "benefit": {"large": "large", "mid": "medium", "small": "small"},
+            "metric": {"mortality": "mortality", "money": "money",
+                       "time": "time", "freedom": "freedom"},
+            "tier": {"vhigh": "very high", "high": "high", "avg": "average"},
+        },
+        "tag_disp": {"money": "Money", "time": "Time", "will": "Willpower",
+                     "benefit": "Benefit", "metric": "Metric"},
+        "chip_sep": ": ",
+        "grade_fmt": "Grade %s",
+        "tier_fmt": "Value: %s",
+        "toc_clip": 46,
+        "scope_all": "all %d sections",
+        "scope_sel": "sections %s",
+        "meta_desc": "How to Live Better (《高性价比人生指南》) — %s, %d recommendations in total. "
+                     "Every entry lists its costs, benefits, evidence grade (A/B/C) and links to the "
+                     "underlying research. Single file, zero dependencies, readable offline.",
+        "search_ph": "Search titles, plain terms, benefits…",
+        "btn_all": "All",
+        "btn_a": "Grade A only",
+        "btn_plain": "Plain terms only",
+        "btn_theme": "Theme",
+        "theme_aria": "Toggle light/dark theme",
+        "jump_aria": "Jump to a section",
+        "count_js": "%1 / %2 entries",
+        "empty": "No matching entries",
+        "top_title": "Back to top",
+        "toc_count": "%d entries",
+        "src_one": "Sources",
+        "src_many": "Sources (%d references)",
+        "langs_aria": "Language",
+        "foot_source": "Content: <em>How to Live Better</em> (《高性价比人生指南》) by "
+                       "<a href=\"%s\" target=\"_blank\" rel=\"noopener\">eternity4719/HowToLiveBetter</a>, "
+                       "licensed <a href=\"%s\" target=\"_blank\" rel=\"noopener\">CC BY 4.0</a>",
+        "foot_snapshot": "; snapshot <span style=\"font-family:var(--mono)\">%s</span>%s",
+        "snap_date": " (%s)",
+        "foot_excerpt": "The “In plain terms” and “Benefit” columns are translated from the Chinese original; "
+                        "%d entries on this page — Grade A: %d, Grade B: %d, Grade C: %d — "
+                        "with %d outbound literature links.",
+        "foot_self": "Self-contained single file: no external resources are loaded (apart from the "
+                     "literature links inside the text), so it reads offline. Page rendered with the "
+                     "single-file builder from <a href=\"%s\" target=\"_blank\" rel=\"noopener\">"
+                     "cdyforever/how-to-live-better</a> (no rights reserved); generated by build.py.",
+        "foot_translated": "English translation by the maintainers of this repository, offered under CC BY 4.0.",
+    },
+}
+
+
+# ------------------------------------------------------------------ parsing
+
+
+def avail_sections(lang):
+    d = CONTENT / lang
+    if not d.is_dir():
+        return []
+    return sorted(int(p.name[:2]) for p in d.glob("[0-9][0-9]-*.md"))
+
+
+def find_file(lang, n):
+    hits = sorted((CONTENT / lang).glob("%02d-*.md" % n))
     if not hits:
-        raise SystemExit("找不到第 %d 节" % n)
+        raise SystemExit("language %r: no file for section %d" % (lang, n))
     return hits[0]
 
 
-def parse(path):
+def compile_parsers(spec):
+    """Build the per-language regexes: field lines and the cost-tag comment."""
+    kw2canon = dict(spec["fields_kw"])
+    field_re = re.compile(r"^-\s*(%s)\s*[:：]\s*(.*)$" %
+                          "|".join(re.escape(k) for k in kw2canon))
+    tagkey2canon = dict(spec["tag_keys"])
+    tag_key_re = re.compile(r"(%s)=(\S+)" %
+                            "|".join(re.escape(k) for k in tagkey2canon))
+    tag_vals = spec["tag_vals"]
+
+    def parse_tags(raw):
+        if not raw:
+            return {}
+        out = {}
+        for k, v in tag_key_re.findall(raw):
+            canon = tagkey2canon[k]
+            out[canon] = tag_vals[canon].get(v, v)
+        return out
+
+    return field_re, kw2canon, parse_tags
+
+
+def parse(path, field_re, kw2canon):
+    """Parse one content/<lang>/NN-*.md into (title, intro, entries).
+
+    Same grammar as the upstream book: '# ' section title, '### N. ' entries,
+    a '<!-- ... -->' cost-tag comment, '- Field: ...' bullet fields with
+    continuation lines.
+    """
     lines = path.read_text(encoding="utf-8").split("\n")
     title, intro, entries, cur = "", [], [], None
     for ln in lines:
@@ -93,14 +279,14 @@ def parse(path):
             if ln.strip() and not ln.startswith("["):
                 intro.append(ln.strip())
             continue
-        mt = re.match(r"^<!--\s*成本标签:\s*(.*?)\s*-->", ln)
+        mt = re.match(r"^<!--\s*(.*?)\s*-->", ln)
         if mt:
             cur["tags_raw"] = mt.group(1)
             continue
-        mf = re.match(r"^-\s*(成本|说人话|收益|证据等级|来源|备注)：(.*)$", ln)
+        mf = field_re.match(ln)
         if mf:
-            cur["last"] = mf.group(1)
-            cur["fields"][mf.group(1)] = mf.group(2).strip()
+            cur["last"] = kw2canon[mf.group(1)]
+            cur["fields"][cur["last"]] = mf.group(2).strip()
             continue
         if not ln.strip():
             cur["last"] = None
@@ -108,25 +294,6 @@ def parse(path):
         if cur["last"]:
             cur["fields"][cur["last"]] += ln.strip()
     return title, intro, entries
-
-
-def parse_tags(raw):
-    if not raw:
-        return {}
-    return dict(re.findall(r"(钱|时间|毅力|收益|口径)=(\S+)", raw))
-
-
-def ratio_of(t):
-    try:
-        cs = sum(COST_W[k][t[k]] for k in ("钱", "时间", "毅力"))
-    except KeyError:
-        return None
-    lv = t.get("收益")
-    if lv == "大":
-        return "极高" if cs == 0 else ("高" if cs <= 2 else "一般")
-    if lv == "中" and cs == 0:
-        return "高"
-    return "一般"
 
 
 def inline(s):
@@ -154,23 +321,7 @@ def link_count(s):
     return len(re.findall(r"https?://", s or ""))
 
 
-def source_rev():
-    """取上游当前提交的短 hash 与日期。
-
-    故意用上游 git 状态而不是构建时间：同样的源状态下重跑结果完全一致，
-    产物可做字节级比对，方便确认「没改坏东西」。
-    """
-    try:
-        p = subprocess.run(["git", "-C", str(REPO), "log", "-1", "--date=short",
-                            "--format=%h|%cd"],
-                           capture_output=True, text=True, encoding="utf-8", timeout=15)
-        if p.returncode == 0 and "|" in (p.stdout or ""):
-            h, d = p.stdout.strip().split("|", 1)
-            return h.strip(), d.strip()
-    except Exception:
-        pass
-    return "", ""
-
+# ---------------------------------------------------------------- rendering
 
 CSS = r"""
 *,*::before,*::after{box-sizing:border-box}
@@ -227,6 +378,11 @@ strong{font-weight:600;color:var(--t1)}
 .btn:hover{border-color:var(--brand-2);color:var(--t1)}
 .btn[aria-pressed=true]{background:var(--brand-soft);border-color:var(--brand-1);color:var(--brand-1)}
 .count{font-size:12px;color:var(--t3);white-space:nowrap;font-variant-numeric:tabular-nums}
+.langs{display:flex;align-items:center;gap:0;font-size:12.5px;white-space:nowrap}
+.langs a{color:var(--t3);padding:2px 5px;border-radius:6px}
+.langs a:hover{color:var(--t1);background:var(--bg-mute);text-decoration:none}
+.langs a[aria-current=true]{color:var(--brand-1);font-weight:600}
+.langs i{font-style:normal;color:var(--divider);margin:0 -1px}
 .jump{display:none;height:30px;max-width:38vw;padding:0 6px;border-radius:8px;border:1px solid var(--divider);
   background:var(--bg-elv);color:var(--t2);font:500 12px/1 var(--font)}
 
@@ -309,14 +465,15 @@ footer a{color:var(--t2)}
   .spacer{display:none}
   .jump{order:2}
   #theme{order:3}
-  #f-all{order:4}#f-a{order:5}#f-plain{order:6}
-  .count{order:7;margin-left:auto}
-  .search{order:8;width:auto;max-width:none;flex:1 1 100%;margin-top:2px}
+  .langs{order:4}
+  #f-all{order:5}#f-a{order:6}#f-plain{order:7}
+  .count{order:8;margin-left:auto}
+  .search{order:9;width:auto;max-width:none;flex:1 1 100%;margin-top:2px}
   .search input{height:34px}
   .search kbd{display:none}
   /* 向下滚动后收成一行（标题+搜索+明暗），把竖向空间还给正文；滚回顶部再展开 */
   body.compact .jump,body.compact #f-all,body.compact #f-a,
-  body.compact #f-plain,body.compact .count{display:none}
+  body.compact #f-plain,body.compact .count,body.compact .langs{display:none}
   body.compact .search{order:2;flex:1 1 120px;margin-top:0}
   body.compact #theme{order:3}
   main{padding:16px 13px 110px}
@@ -347,51 +504,7 @@ footer a{color:var(--t2)}
 }
 """
 
-
-def render_entry(e, sec_no):
-    t = parse_tags(e["tags_raw"])
-    f = e["fields"]
-    grade = (f.get("证据等级") or "?").strip()[:1]
-    ratio = ratio_of(t)
-    chips = []
-    gcls = {"A": "gA", "B": "gB", "C": "gC"}.get(grade, "gC")
-    chips.append('<span class="badge %s">%s 级</span>' % (gcls, grade))
-    if ratio:
-        chips.append('<span class="badge r%d">性价比 %s</span>' % (RATIO_ORDER[ratio], ratio))
-    for k in ("口径",):
-        if t.get(k):
-            chips.append('<span class="tag">%s %s</span>' % (k, t[k]))
-    for k in ("钱", "时间", "毅力"):
-        if t.get(k):
-            chips.append('<span class="tag">%s %s</span>' % (k, t[k]))
-    if t.get("收益"):
-        chips.append('<span class="tag">收益 %s</span>' % t["收益"])
-
-    rows = []
-    for k in ("成本", "收益"):
-        if f.get(k):
-            rows.append('<div class="f"><b>%s</b><div>%s</div></div>' % (k, inline(f[k])))
-    if f.get("备注"):
-        rows.append('<div class="f note"><b>备注</b><div>%s</div></div>' % inline(f["备注"]))
-
-    src = f.get("来源", "")
-    n = link_count(src)
-    src_html = ""
-    if src:
-        src_html = ('<details class="src"><summary>来源%s</summary>'
-                    '<div class="sbody">%s</div></details>'
-                    % ("（%d 条文献）" % n if n else "", inline(src)))
-
-    return ('<article class="card" id="s%d-%d" data-grade="%s" data-ratio="%s">'
-            '<div class="chead"><span class="num">%d</span><h3>%s</h3></div>'
-            '<div class="chips">%s</div>'
-            '<p class="plain">%s</p>'
-            '<div class="fields">%s</div>%s</article>') % (
-        sec_no, e["no"], grade, ratio or "-", e["no"], inline(e["title"]),
-        "".join(chips), inline(f.get("说人话", "")), "".join(rows), src_html)
-
-
-JS = r"""
+JS_CORE = r"""
 const cards=[...document.querySelectorAll('.card')];
 const secs=[...document.querySelectorAll('section')];
 const bar=document.querySelector('.bar');
@@ -463,7 +576,7 @@ function apply(){
     }
   });
   document.getElementById('empty').classList.toggle('hidden',shown>0);
-  cnt.textContent=shown+' / '+cards.length+' 条';
+  cnt.textContent=L10N.count.replace('%1',shown).replace('%2',cards.length);
   if(term) markAll(document.querySelector('main'),term);
   document.querySelectorAll('.toc a').forEach(a=>{
     const el=document.getElementById(a.getAttribute('href').slice(1));
@@ -540,103 +653,303 @@ cards.forEach(c=>io.observe(c));
 if(jump) secs.forEach(s=>io.observe(s));
 """
 
+LANGS_JS = r"""
+/* 语言切换：记住手动选择，回落地页时直接进该语言 */
+document.querySelectorAll('.langs a').forEach(a=>{
+  a.addEventListener('click',()=>{try{localStorage.setItem('hltb-lang',a.dataset.lang);}catch(e){}});
+});
+"""
 
-def main():
-    sec_toc = []
-    sec_html = []
-    jump_opts = []
+
+def page_js(count_fmt):
+    """Identical page logic for every language; only the count-line format
+    string is localized (injected as the L10N constant)."""
+    return "const L10N={count:%s};\n" % json.dumps(count_fmt, ensure_ascii=False) + JS_CORE + LANGS_JS
+
+
+def render_entry(e, sec_no, spec, parse_tags):
+    t = parse_tags(e["tags_raw"])
+    f = e["fields"]
+    grade = (f.get("evidence") or "?").strip()[:1]
+    ratio = ratio_of(t)
+    disp, tk, sep = spec["disp"], spec["tag_disp"], spec["chip_sep"]
+    chips = []
+    gcls = {"A": "gA", "B": "gB", "C": "gC"}.get(grade, "gC")
+    chips.append('<span class="badge %s">%s</span>' % (gcls, spec["grade_fmt"] % grade))
+    if ratio:
+        chips.append('<span class="badge r%d">%s</span>'
+                     % (TIER_ORDER[ratio], spec["tier_fmt"] % disp["tier"][ratio]))
+    if t.get("metric"):
+        chips.append('<span class="tag">%s</span>' % (tk["metric"] + sep + disp["metric"][t["metric"]]))
+    for k in ("money", "time", "will"):
+        if t.get(k):
+            chips.append('<span class="tag">%s</span>' % (tk[k] + sep + disp[k][t[k]]))
+    if t.get("benefit"):
+        chips.append('<span class="tag">%s</span>' % (tk["benefit"] + sep + disp["benefit"][t["benefit"]]))
+
+    field_disp = {canon: kw for kw, canon in spec["fields_kw"].items()}
+    rows = []
+    for k in ("cost", "benefit"):
+        if f.get(k):
+            rows.append('<div class="f"><b>%s</b><div>%s</div></div>' % (field_disp[k], inline(f[k])))
+    if f.get("note"):
+        rows.append('<div class="f note"><b>%s</b><div>%s</div></div>' % (field_disp["note"], inline(f["note"])))
+
+    src = f.get("source", "")
+    n = link_count(src)
+    src_html = ""
+    if src:
+        src_html = ('<details class="src"><summary>%s</summary>'
+                    '<div class="sbody">%s</div></details>'
+                    % ((spec["src_many"] % n) if n else spec["src_one"], inline(src)))
+
+    return ('<article class="card" id="s%d-%d" data-grade="%s" data-ratio="%s">'
+            '<div class="chead"><span class="num">%d</span><h3>%s</h3></div>'
+            '<div class="chips">%s</div>'
+            '<p class="plain">%s</p>'
+            '<div class="fields">%s</div>%s</article>') % (
+        sec_no, e["no"], grade, ratio or "-", e["no"], inline(e["title"]),
+        "".join(chips), inline(f.get("plain", "")), "".join(rows), src_html)
+
+
+def lang_switcher(current, built):
+    parts = []
+    for code in built:
+        spec = LANGS[code]
+        cur = ' aria-current="true"' if code == current else ""
+        parts.append('<a href="../%s/index.html" hreflang="%s" data-lang="%s" lang="%s"%s>%s</a>'
+                     % (code, spec["html_lang"], code, spec["html_lang"], cur, spec["label"]))
+    return '<nav class="langs" aria-label="%s">%s</nav>' % (
+        html.escape(LANGS[current]["langs_aria"]), "<i> · </i>".join(parts))
+
+
+# ------------------------------------------------------------------ builds
+
+
+def build_lang(lang, sections, out=None, built=None):
+    spec = LANGS[lang]
+    field_re, kw2canon, parse_tags = compile_parsers(spec)
+    built = built or [lang]
+
+    sec_toc, sec_html, jump_opts = [], [], []
     total = 0
     grade_cnt = {"A": 0, "B": 0, "C": 0}
     link_total = 0
 
-    for n in SECTIONS:
-        p = find_file(n)
-        title, intro, entries = parse(p)
-        cards = []
-        links = []
+    for n in sections:
+        title, intro, entries = parse(find_file(lang, n), field_re, kw2canon)
+        cards, links = [], []
         for e in entries:
-            g = (e["fields"].get("证据等级") or "?").strip()[:1]
+            g = (e["fields"].get("evidence") or "?").strip()[:1]
             if g in grade_cnt:
                 grade_cnt[g] += 1
             total += 1
-            link_total += link_count(e["fields"].get("来源", "")) + link_count(e["fields"].get("备注", ""))
-            cards.append(render_entry(e, n))
+            link_total += link_count(e["fields"].get("source", "")) + link_count(e["fields"].get("note", ""))
+            cards.append(render_entry(e, n, spec, parse_tags))
             r = ratio_of(parse_tags(e["tags_raw"]))
-            short = e["title"] if len(e["title"]) <= 34 else e["title"][:33] + "…"
+            clip = spec["toc_clip"]
+            short = e["title"] if len(e["title"]) <= clip else e["title"][:clip - 1] + "…"
             links.append('<a href="#s%d-%d" title="%s"><span class="dot d%d"></span>'
                          '<i>%d</i><span>%s</span></a>'
                          % (n, e["no"], html.escape(e["title"], quote=True),
-                            RATIO_ORDER.get(r, 2), e["no"], html.escape(short)))
-        sec_toc.append('<div class="grp"><div class="gt">%s<small>%d 条</small></div>%s</div>'
-                       % (inline(title), len(entries), "".join(links)))
+                            TIER_ORDER.get(r, 2), e["no"], html.escape(short)))
+        sec_toc.append('<div class="grp"><div class="gt">%s<small>%s</small></div>%s</div>'
+                       % (inline(title), spec["toc_count"] % len(entries), "".join(links)))
         sec_html.append(
             '<section id="sec%d"><div class="sec-h"><h2>%s</h2>'
-            '<span class="meta">%d 条</span></div>%s%s</section>'
-            % (n, inline(title), len(entries),
+            '<span class="meta">%s</span></div>%s%s</section>'
+            % (n, inline(title), spec["toc_count"] % len(entries),
                ('<p class="intro">%s</p>' % inline(" ".join(intro))) if intro else "",
                "".join(cards)))
         jump_opts.append('<option value="sec%d">%s</option>' % (n, html.escape(title)))
 
-    rev, rev_date = source_rev()
+    rev, rev_date = load_vendor()
+    all_secs = avail_sections(lang)
+    scope = ((spec["scope_all"] % len(all_secs)) if sections == all_secs
+             else spec["scope_sel"] % ", ".join(str(n) for n in sections))
 
-    head = ('<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="utf-8">'
+    head = ('<!DOCTYPE html><html lang="%s" data-theme="light"><head><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
             '<meta name="color-scheme" content="light dark">'
             '<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">'
             '<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1b1b1f">'
-            '<meta name="description" content="《高性价比人生指南》%s，共 %d 条建议，'
-            '每条标注成本、收益、证据等级（A/B/C）与原始文献链接。单文件、零依赖、可离线阅读。">'
-            '<title>高性价比人生指南 · %s</title><style>%s</style></head><body>'
-            % (SCOPE, total, SCOPE, CSS))
+            '<meta name="description" content="%s">'
+            '<title>%s · %s</title><style>%s</style></head><body>'
+            % (spec["html_lang"], html.escape(spec["meta_desc"] % (scope, total), quote=True),
+               html.escape(spec["book_title"]), html.escape(scope), CSS))
 
-    bar = ('<header class="bar"><h1>高性价比人生指南<small>%s</small></h1>'
-           '<select class="jump" id="jump" aria-label="跳转到某一节">%s</select>'
+    bar = ('<header class="bar"><h1>%s<small>%s</small></h1>'
+           '<select class="jump" id="jump" aria-label="%s">%s</select>'
            '<div class="spacer"></div>'
-           '<button class="btn" id="f-all">全部</button>'
-           '<button class="btn" id="f-a">只看 A 级</button>'
-           '<button class="btn" id="f-plain">只看说人话</button>'
+           '<button class="btn" id="f-all">%s</button>'
+           '<button class="btn" id="f-a">%s</button>'
+           '<button class="btn" id="f-plain">%s</button>'
            '<div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/>'
            '<path d="M20 20l-3.5-3.5"/></svg>'
-           '<input id="q" type="search" placeholder="搜索标题、说人话、收益…" autocomplete="off">'
+           '<input id="q" type="search" placeholder="%s" autocomplete="off">'
            '<kbd>/</kbd></div>'
-           '<span class="count" id="cnt">%d / %d 条</span>'
-           '<button class="btn" id="theme">明/暗</button></header>' % (
-               SCOPE, "".join(jump_opts), total, total))
+           '<span class="count" id="cnt">%s</span>%s'
+           '<button class="btn" id="theme" aria-label="%s" title="%s">%s</button></header>' % (
+               html.escape(spec["book_title"]), html.escape(scope),
+               html.escape(spec["jump_aria"]), "".join(jump_opts),
+               html.escape(spec["btn_all"]), html.escape(spec["btn_a"]), html.escape(spec["btn_plain"]),
+               html.escape(spec["search_ph"], quote=True),
+               html.escape(spec["count_js"].replace("%1", str(total)).replace("%2", str(total))),
+               lang_switcher(lang, built),
+               html.escape(spec["theme_aria"]), html.escape(spec["theme_aria"]),
+               html.escape(spec["btn_theme"])))
 
-    src_line = '数据来源：<a href="%s" target="_blank" rel="noopener">eternity4719/HowToLiveBetter</a>' % UPSTREAM
-    src_line += '（Unlicense，公有领域）'
+    foot = spec["foot_source"] % (UPSTREAM, CC_BY)
     if rev:
-        src_line += '，数据截至 <span style="font-family:var(--mono)">%s</span>%s' % (
-            rev, '（%s）' % rev_date if rev_date else '')
-
-    footer = ('<footer>%s。<br>'
-              '「说人话」「收益」等栏目为原文摘录，未作改写；本页共 %d 条，'
-              'A 级 %d 条、B 级 %d 条、C 级 %d 条，含 %d 条文献外链。<br>'
-              '单文件自包含，不引用任何外部资源（正文中的文献链接除外），可离线阅读。'
-              '由 build.py 生成。</footer>'
-              % (src_line, total, grade_cnt["A"], grade_cnt["B"], grade_cnt["C"], link_total))
+        foot += spec["foot_snapshot"] % (rev, (spec["snap_date"] % rev_date) if rev_date else "")
+    foot += ".<br>" + (spec["foot_excerpt"] % (total, grade_cnt["A"], grade_cnt["B"], grade_cnt["C"], link_total))
+    foot += "<br>" + (spec["foot_self"] % RENDERER)
+    if spec["foot_translated"]:
+        foot += "<br>" + spec["foot_translated"]
+    footer = "<footer>%s</footer>" % foot
 
     shell = ('<div class="shell"><aside class="toc">%s</aside><main>%s'
-             '<div class="empty hidden" id="empty">没有匹配的条目</div>%s'
+             '<div class="empty hidden" id="empty">%s</div>%s'
              '</main></div>'
-             '<button id="top" title="回到顶部" aria-label="回到顶部">↑</button>'
-             % ("".join(sec_toc), "".join(sec_html), footer))
+             '<button id="top" title="%s" aria-label="%s">↑</button>'
+             % ("".join(sec_toc), "".join(sec_html), html.escape(spec["empty"]), footer,
+                html.escape(spec["top_title"]), html.escape(spec["top_title"])))
 
-    # 注意：JS 字符串只含脚本体，<script> 开合标签在这里拼。
-    # 之前漏了开标签，导致整段 JS 被当纯文本渲染在页面底部、脚本从未执行。
-    out = head + bar + shell + "<script>" + JS + "</script></body></html>"
+    out_html = head + bar + shell + "<script>" + page_js(spec["count_js"]) + "</script></body></html>"
 
-    if ARGS.out:
-        name = Path(ARGS.out)
+    if out:
+        name = Path(out)
         if not name.is_absolute():
             name = HERE / name
     else:
-        name = HERE / ("高性价比人生指南_%s.html" % "_".join("第%d节" % n for n in SECTIONS))
+        name = HERE / lang / "index.html"
+    name.parent.mkdir(parents=True, exist_ok=True)
+    name.write_text(out_html, encoding="utf-8")
 
-    name.write_text(out, encoding="utf-8")
-    print("范围 %s ｜ 节数 %d ｜ 条目 %d ｜ A %d B %d C %d ｜ 外链 %d"
-          % (SCOPE, len(SECTIONS), total, grade_cnt["A"], grade_cnt["B"], grade_cnt["C"], link_total))
-    print("输出：%s  (%d 字节)" % (name, len(out.encode("utf-8"))))
+    print("[%s] sections %d | entries %d | A %d B %d C %d | links %d | %s (%d bytes)"
+          % (lang, len(sections), total, grade_cnt["A"], grade_cnt["B"], grade_cnt["C"],
+             link_total, name, len(out_html.encode("utf-8"))))
+    return total
+
+
+LANDING_CSS = r"""
+*,*::before,*::after{box-sizing:border-box}
+:root{--bg:#ffffff;--divider:#e2e2e3;--t1:rgba(60,60,67,1);--t2:rgba(60,60,67,.78);--t3:rgba(60,60,67,.56);
+  --brand-1:#3451b2;--brand-2:#3a5ccc;--brand-soft:rgba(100,108,255,.12);
+  --font:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif}
+[data-theme=dark]{--bg:#1b1b1f;--divider:#2e2e32;--t1:rgba(255,255,245,.88);--t2:rgba(235,235,245,.62);
+  --t3:rgba(235,235,245,.4);--brand-1:#a8b1ff;--brand-2:#c3c9ff;--brand-soft:rgba(100,108,255,.18)}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--t1);font:16px/1.8 var(--font);
+  -webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
+main{flex:1;max-width:640px;margin:0 auto;padding:11vh 24px 40px}
+h1{font-size:30px;font-weight:700;letter-spacing:-.5px;margin:0 0 6px}
+h1 span{font-size:17px;font-weight:500;color:var(--t2);margin-left:10px;white-space:nowrap}
+p{color:var(--t2);margin:0 0 34px}
+ul{list-style:none;margin:0 0 40px;padding:0}
+li{border:1px solid var(--divider);border-radius:12px;margin-bottom:10px;overflow:hidden}
+li a{display:flex;justify-content:space-between;align-items:baseline;padding:14px 18px;color:var(--t1);
+  font-size:17px}
+li a:hover{background:var(--brand-soft);text-decoration:none;color:var(--brand-1)}
+li a small{color:var(--t3);font-size:13px}
+li a[lang]{font-weight:600}
+footer{color:var(--t3);font-size:12.5px;border-top:1px solid var(--divider);
+  max-width:640px;width:100%;margin:0 auto;padding:16px 24px 28px;line-height:1.9}
+footer a{color:var(--t2)}
+a{color:var(--brand-1);text-decoration:none}
+a:hover{color:var(--brand-2);text-decoration:underline;text-underline-offset:2px}
+"""
+
+
+def build_landing(built, entry_total, section_total):
+    codes = json.dumps(built)
+    items = []
+    for code in built:
+        spec = LANGS[code]
+        note = "原文" if code == "zh" else "translation"
+        items.append('<li><a href="%s/" lang="%s">%s</a><small>%s</small></li>'
+                     % (code, spec["html_lang"], spec["label"], note))
+    foot = ('Content: <em>How to Live Better</em> (《高性价比人生指南》) by '
+            '<a href="%s" target="_blank" rel="noopener">eternity4719/HowToLiveBetter</a>, '
+            'licensed <a href="%s" target="_blank" rel="noopener">CC BY 4.0</a>. '
+            'Page rendered with the builder from <a href="%s" target="_blank" rel="noopener">'
+            'cdyforever/how-to-live-better</a> (no rights reserved). '
+            'Translations into other languages are made by this repository.'
+            % (UPSTREAM, CC_BY, RENDERER))
+    rev, rev_date = load_vendor()
+    if rev:
+        foot += ' Snapshot <span style="font-family:ui-monospace,monospace">%s</span>%s.' % (
+            rev, (" (%s)" % rev_date) if rev_date else "")
+    page = ('<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
+            '<meta name="color-scheme" content="light dark">'
+            '<meta name="description" content="How to Live Better (《高性价比人生指南》) — '
+            'a cost-effectiveness guide to life. %d sections, %d recommendations, each with costs, '
+            'benefits, an evidence grade (A/B/C) and links to the research. Multiple languages, '
+            'single-file pages, readable offline.">'
+            '<title>How to Live Better · 高性价比人生指南</title>'
+            '<style>%s</style></head><body><main>'
+            '<h1>How to Live Better<span lang="zh">高性价比人生指南</span></h1>'
+            '<p>A cost-effectiveness guide to life: %d sections, %d recommendations, each spelling '
+            'out what it costs you, what it gets you, and how solid the evidence is. Pick a language:</p>'
+            '<ul>%s</ul></main><footer>%s</footer>'
+            '<script>var LANGS=%s;(function(){var d=document.documentElement;'
+            'try{var t=localStorage.getItem(\'hltb-theme\');if(t)d.setAttribute(\'data-theme\',t);'
+            'else if(window.matchMedia&&window.matchMedia(\'(prefers-color-scheme: dark)\').matches)'
+            'd.setAttribute(\'data-theme\',\'dark\');}catch(e){}'
+            'function go(c){location.replace(c+\'/\');}'
+            'try{var s=localStorage.getItem(\'hltb-lang\');if(s&&LANGS.indexOf(s)>=0)return go(s);'
+            'var p=navigator.languages||[navigator.language||\'en\'];'
+            'for(var i=0;i<p.length;i++){var q=(p[i]||\'\').toLowerCase().split(\'-\')[0];'
+            'if(LANGS.indexOf(q)>=0)return go(q);}}catch(e){}go(\'en\');})();</script>'
+            '</body></html>'
+            % (section_total, entry_total, LANDING_CSS, section_total, entry_total,
+               "".join(items), foot, codes))
+    (HERE / "index.html").write_text(page, encoding="utf-8")
+    print("[landing] %d languages -> index.html (%d bytes)"
+          % (len(built), len(page.encode("utf-8"))))
+
+
+def main():
+    ap = argparse.ArgumentParser(description="Build the multilingual single-file reading pages")
+    ap.add_argument("sections", nargs="*", help="section numbers (dev; default: all sections)")
+    ap.add_argument("--lang", default="all",
+                    help="language code (%s) or 'all' (default)" % "/".join(LANGS))
+    ap.add_argument("-o", "--out", default=None, help="output file (dev; default <lang>/index.html)")
+    args = ap.parse_args()
+
+    present = [c for c in LANGS if avail_sections(c)]
+    if not present:
+        raise SystemExit("no content/<lang>/NN-*.md found under %s" % CONTENT)
+
+    if args.lang == "all":
+        if args.sections:
+            raise SystemExit("--lang all ignores section selection; use --lang <code> for a subset")
+        for c in present:
+            build_lang(c, avail_sections(c), built=present)
+        zh = LANGS and "zh" in present
+        # entry/section totals for the landing come from the original (zh)
+        src_lang = "zh" if zh else present[0]
+        field_re, kw2canon, _ = compile_parsers(LANGS[src_lang])
+        total = 0
+        for n in avail_sections(src_lang):
+            _, _, entries = parse(find_file(src_lang, n), field_re, kw2canon)
+            total += len(entries)
+        build_landing(present, total, len(avail_sections(src_lang)))
+        return
+
+    if args.lang not in LANGS:
+        raise SystemExit("unknown language %r; known: %s (dirs present: %s)"
+                         % (args.lang, "/".join(LANGS), "/".join(present)))
+    if args.lang not in present:
+        raise SystemExit("language %r has no content directory" % args.lang)
+
+    avail = avail_sections(args.lang)
+    sections = [int(a) for a in args.sections] if args.sections else avail
+    missing = [n for n in sections if n not in avail]
+    if missing:
+        raise SystemExit("language %r: no sections %s" % (args.lang, missing))
+    build_lang(args.lang, sections, out=args.out, built=present)
 
 
 if __name__ == "__main__":
