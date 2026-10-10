@@ -410,6 +410,51 @@ LANGS = {
 }
 
 
+# ------------------------------------------------------------------- flags
+# Simplified national flags, one per language, embedded as inline SVG so the
+# pages stay single-file and offline (no emoji flags — they degrade to letter
+# pairs on Windows — and no external images). Each is a few hundred bytes on
+# a 30x20 viewBox; a CSS border in --divider keeps white areas visible in
+# dark mode. The flag is decorative: the text label beside it names the
+# language for screen readers.
+
+_STAR = ("M0-1 .224-.309 .951-.309 .363.118 .588.809 0 .382 -.588.809"
+         " -.363.118 -.951-.309 -.224-.309Z")  # unit 5-point star, point up
+
+FLAGS = {
+    "zh": '<path fill="#DE2910" d="M0 0h30v20H0z"/><g fill="#FFDE00">'
+          '<path d="%(s)s" transform="translate(5 5) scale(3)"/>'
+          '<path d="%(s)s" transform="translate(10 2)"/>'
+          '<path d="%(s)s" transform="translate(12 4)"/>'
+          '<path d="%(s)s" transform="translate(12 7)"/>'
+          '<path d="%(s)s" transform="translate(10 9)"/></g>' % {"s": _STAR},
+    "en": '<path fill="#012169" d="M0 0h30v20H0z"/>'
+          '<path stroke="#fff" stroke-width="3.4" d="M0 0l30 20M30 0L0 20"/>'
+          '<path stroke="#C8102E" stroke-width="2" d="M0 0l30 20M30 0L0 20"/>'
+          '<path stroke="#fff" stroke-width="6.7" d="M15 0v20M0 10h30"/>'
+          '<path stroke="#C8102E" stroke-width="4" d="M15 0v20M0 10h30"/>',
+    "de": '<path fill="#000" d="M0 0h30v20H0z"/>'
+          '<path fill="#D00" d="M0 6.7h30v6.6H0z"/>'
+          '<path fill="#FFCE00" d="M0 13.3h30v6.7H0z"/>',
+    "ru": '<path fill="#fff" d="M0 0h30v6.7H0z"/>'
+          '<path fill="#0039A6" d="M0 6.7h30v6.6H0z"/>'
+          '<path fill="#D52B1E" d="M0 13.3h30v6.7H0z"/>',
+    "sr": '<path fill="#C6363C" d="M0 0h30v6.7H0z"/>'
+          '<path fill="#0C4076" d="M0 6.7h30v6.6H0z"/>'
+          '<path fill="#fff" d="M0 13.3h30v6.7H0z"/>'
+          '<path fill="#C6363C" stroke="#FFCE00" stroke-width=".9" '
+          'd="M11.8 8.3L15 7.4l3.2 .9v3.5c0 2.7-1.9 4.3-3.2 5'
+          '-1.3-.7-3.2-2.3-3.2-5z"/>',
+}
+
+
+def flag_svg(code):
+    """Decorative inline flag for a language link; the text label that
+    follows it in the same link carries the language name."""
+    return ('<svg class="fl" viewBox="0 0 30 20" aria-hidden="true" '
+            'focusable="false">%s</svg>' % FLAGS[code])
+
+
 # ------------------------------------------------------------------ parsing
 
 
@@ -573,7 +618,8 @@ strong{font-weight:600;color:var(--t1)}
 .btn[aria-pressed=true]{background:var(--brand-soft);border-color:var(--brand-1);color:var(--brand-1)}
 .count{font-size:12px;color:var(--t3);white-space:nowrap;font-variant-numeric:tabular-nums}
 .langs{display:flex;align-items:center;gap:0;font-size:12.5px;white-space:nowrap}
-.langs a{color:var(--t3);padding:2px 5px;border-radius:6px}
+.langs a{display:inline-flex;align-items:center;gap:5px;color:var(--t3);padding:2px 5px;border-radius:6px}
+.fl{width:16px;height:11px;flex:none;border-radius:2px;border:1px solid var(--divider)}
 .langs a:hover{color:var(--t1);background:var(--bg-mute);text-decoration:none}
 .langs a[aria-current=true]{color:var(--brand-1);font-weight:600}
 .langs i{font-style:normal;color:var(--divider);margin:0 -1px}
@@ -937,8 +983,9 @@ def lang_switcher(current, built):
     for code in built:
         spec = LANGS[code]
         cur = ' aria-current="true"' if code == current else ""
-        parts.append('<a href="../%s/index.html" hreflang="%s" data-lang="%s" lang="%s"%s>%s</a>'
-                     % (code, spec["html_lang"], code, spec["html_lang"], cur, spec["label"]))
+        parts.append('<a href="../%s/index.html" hreflang="%s" data-lang="%s" lang="%s"%s>%s%s</a>'
+                     % (code, spec["html_lang"], code, spec["html_lang"], cur,
+                        flag_svg(code), spec["label"]))
     return '<nav class="langs" aria-label="%s">%s</nav>' % (
         html.escape(LANGS[current]["langs_aria"]), "<i> · </i>".join(parts))
 
@@ -1068,8 +1115,9 @@ h1 span{font-size:17px;font-weight:500;color:var(--t2);margin-left:10px;white-sp
 p{color:var(--t2);margin:0 0 34px}
 ul{list-style:none;margin:0 0 40px;padding:0}
 li{border:1px solid var(--divider);border-radius:12px;margin-bottom:10px;overflow:hidden}
-li a{display:flex;justify-content:space-between;align-items:baseline;padding:14px 18px;color:var(--t1);
+li a{display:flex;align-items:center;gap:9px;padding:14px 18px;color:var(--t1);
   font-size:17px}
+li a .fl{width:21px;height:14px;flex:none;border-radius:3px;border:1px solid var(--divider)}
 li a:hover{background:var(--brand-soft);text-decoration:none;color:var(--brand-1)}
 li a small{color:var(--t3);font-size:13px}
 li a[lang]{font-weight:600}
@@ -1087,8 +1135,8 @@ def build_landing(built, entry_total, section_total):
     for code in built:
         spec = LANGS[code]
         note = "原文" if code == "zh" else "translation"
-        items.append('<li><a href="%s/" lang="%s">%s</a><small>%s</small></li>'
-                     % (code, spec["html_lang"], spec["label"], note))
+        items.append('<li><a href="%s/" lang="%s">%s%s</a><small>%s</small></li>'
+                     % (code, spec["html_lang"], flag_svg(code), spec["label"], note))
     foot = ('Content: <em>How to Live Better</em> (《高性价比人生指南》) by '
             '<a href="%s" target="_blank" rel="noopener">eternity4719/HowToLiveBetter</a>, '
             'licensed <a href="%s" target="_blank" rel="noopener">CC BY 4.0</a>. '
