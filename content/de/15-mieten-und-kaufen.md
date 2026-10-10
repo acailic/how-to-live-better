@@ -1,6 +1,6 @@
 # 15. Mieten und Kaufen
 
-Kennzahl: Geld. Mieten verliert Geld am leichtesten über Kautionen und Makler; Kaufen über Kreditzinsen und alles, was der Verkäufer weiß und du nicht.
+Kennzahl= Geld. Mieten verliert Geld am leichtesten über Kautionen und Makler; Kaufen über Kreditzinsen und alles, was der Verkäufer weiß und du nicht.
 
 ### 1. Höhe der Mietkaution, Rückgabezeit und Abzugsbedingungen müssen in den Vertrag
 <!-- costs: Geld=0 Zeit=wenig Wille=etwas Nutzen=mittel Kennzahl=Geld -->
