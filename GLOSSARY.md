@@ -203,3 +203,58 @@ Canonical Russian terminology, mirroring the English table above. Адресац
 - Никогда не выдумывать, смягчать или ужесточать медицинское, финансовое или правовое утверждение; переводить смысл точно, включая оговорки (约 → около, 可能 → может, 或许 → возможно).
 - Где оригинал помечает неопределённость («这个数要打折看»), пометка остаётся равно заметной.
 - Названия исследований, имена авторов, обозначения (OR/RR/HR/CI) и ссылки остаются латиницей дословно.
+||||||| fb8d549
+
+---
+
+# Translation glossary (SR)
+
+Srpski — latinično pismo, ekavica (standard Srbije), pristojni oblik „vi", navodnici „…". Terminologija za prevod knjige na srpski; struktura odgovara engleskoj tabeli gore.
+
+## Book-level terms (sr)
+
+| Chinese | Serbian |
+|---|---|
+| 《高性价比人生指南》 | *Kako živeti bolje* (kratko: knjiga). Podnaslov: vodič kroz isplativost života |
+| 说人话 | Prostim jezikom (naziv polja) |
+| 证据等级 | Nivo dokaza |
+| A 级 / B 级 / C 级 | ocena A / ocena B / ocena C (u tekstu: „Nivo dokaza: A") |
+| 性价比 | isplativost (u prozi); vrednost (u bedževima) |
+| 极高 / 高 / 一般 (tier) | vrlo visoka / visoka / prosezna |
+| 成本 | Trošak |
+| 收益 | Korist |
+| 条 / 节 | stavka / odeljak („Odeljak 7, stavka 8" za 第 7 节第 8 条) |
+| 元 | juan (nikad ne pretvarati u druge valute) |
+| 相对风险 / 风险比 | RR — relativni rizik; OR — odnos šansi; HR — odnos opasnosti |
+| 置信区间 | CI — raspon poverenja (95% CI … do …) |
+| meta 分析 / 系统综述 | meta-analiza / sistematski pregled |
+| 随机对照试验 | randomizovano kontrolisano iskušavanje |
+| 队列研究 | kohortna studija |
+| 作者经验，无直接文献 | Iskustvo autora, nema direktne literature |
+
+## Tags (file tokens) — sr
+
+`<!-- costs: novac=nema vreme=malo volja=delimično korist=velika mera=smrtnost -->`
+
+| English token | Serbian token |
+|---|---|
+| money=none / low / high | novac=nema / malo / puno |
+| time=low / medium / high | vreme=malo / srednje / puno |
+| will=no / some / yes | volja=ne / delimično / da |
+| benefit=large / medium / small | korist=velika / srednja / mala |
+| metric=mortality / money / time / freedom | mera=smrtnost / novac / vreme / sloboda |
+
+Napomena: dijakritike su obavezne u tokenima (`volja=delimično`, nikad `delimicno` — ASCII varijanta pada na proveri).
+
+## Field labels (sr)
+
+- Cost → `Trošak:` / In plain terms → `Prostim jezikom:` / Benefit → `Korist:` / Evidence grade → `Nivo dokaza:` / Sources → `Izvori:` / Note → `Napomena:`
+
+## Style rules (sr)
+
+- Latinica + ekavica; „…" navodnici; pristojni oblik „vi" u drugom licu.
+- Brojevi: zapeta za hiljade, tačka za decimale — identično engleskom (100,000; 95% CI 1.03–1.31; P=0.02). Nikad tačka za hiljade („100.000" je greška).
+- Izvori se kopiraju doslovno iz engleske verzije, uključujući kineski tekst i URL-ove; URL-ovi moraju odgovarati zh originalu po stavci (ne globalna zamena puteva).
+- Finansijski/medicinski/pravni iskazi: nikad ne izmišljati, ublažavati ni pooštravati; hedge-ove preneti jednako vidljivo (约 → „oko", 可能 → „može", 或许 → „možda").
+- Unakrsne reference: „Odeljak X, stavka Y" običан tekst, bez linka — kao u originalu.
+- Srpske skovanice koje se ponavljaju: odeljak, stavka, ocena, isplativost, raspon poverenja, randomizovano kontrolisano iskušavanje, kohortna studija, sistematski pregled, zatajenje jetre/bubrega, prevencija, skrining, dozvola (licence), uverenje o rođenju.
