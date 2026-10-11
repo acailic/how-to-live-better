@@ -20,3 +20,10 @@ zh, en, then new languages in merge order), concatenate glossary sections, take
 either side of generated HTML, then run `python3 build.py` to regenerate all
 outputs canonically. Parity gate: `python3 tools/check_translation.py <lang>`
 must report 0 problems (digit warnings are a known Chinese-numeral class).
+
+## Python formatter
+
+`pyproject.toml` is authoritative: `ruff format --check .` must pass; it deliberately
+excludes `build.py` and `tools/check_translation.py` (hand-wrapped compact style a
+Black-style formatter cannot reproduce) and pins `line-length = 100` for any future
+Python file. Do not reformat the two excluded files; do not widen the exclusion.

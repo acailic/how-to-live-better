@@ -1,0 +1,25 @@
+# Formatter configuration for this repository.
+#
+# The two Python files that exist (build.py, tools/check_translation.py) are
+# written in a compact, hand-wrapped style: CJK-heavy dict literals and string
+# tables use aligned multi-element continuations, and long data lines (e.g. the
+# favicon data-URI) run past 100 columns on purpose. Black-style formatters
+# cannot reproduce that layout — they either join wrapped literals into one
+# line (large line-length) or explode them one element per line (default 88) —
+# so formatting these files would be whole-file churn with no semantic gain.
+# They are therefore deliberately excluded from `ruff format`.
+#
+# line-length = 100 documents the repo's actual compact style (p95 of build.py
+# is 101 chars); any future Python file should be formatted with this limit.
+[tool.ruff]
+line-length = 100
+# Apply the format exclusion below even when files are named explicitly
+# (e.g. `ruff format --check build.py`), so the decision cannot be bypassed
+# by invocation style.
+force-exclude = true
+
+[tool.ruff.format]
+exclude = [
+    "build.py",
+    "tools/check_translation.py",
+]
