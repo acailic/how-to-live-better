@@ -133,6 +133,8 @@ LANGS = {
         "empty": "没有匹配的条目",
         "top_title": "回到顶部",
         "toc_count": "%d 条",
+        "toc_show_all": "显示全部",
+        "toc_hide_all": "全部收起",
         "src_one": "来源",
         "src_many": "来源（%d 条文献）",
         "langs_aria": "切换语言",
@@ -199,6 +201,8 @@ LANGS = {
         "empty": "No matching entries",
         "top_title": "Back to top",
         "toc_count": "%d entries",
+        "toc_show_all": "Show all",
+        "toc_hide_all": "Collapse all",
         "src_one": "Sources",
         "src_many": "Sources (%d references)",
         "langs_aria": "Language",
@@ -263,6 +267,8 @@ LANGS = {
         "empty": "Keine passenden Einträge",
         "top_title": "Nach oben",
         "toc_count": "%d Einträge",
+        "toc_show_all": "Alles anzeigen",
+        "toc_hide_all": "Alles einklappen",
         "src_one": "Quelle",
         "src_many": "Quellen (%d Literaturangaben)",
         "langs_aria": "Sprache",
@@ -327,6 +333,8 @@ LANGS = {
         "empty": "Подходящих записей нет",
         "top_title": "Наверх",
         "toc_count": "%d",
+        "toc_show_all": "Показать все",
+        "toc_hide_all": "Свернуть все",
         "src_one": "Источник",
         "src_many": "Источники (%d)",
         "langs_aria": "Язык",
@@ -392,6 +400,8 @@ LANGS = {
         "empty": "Nema stavki koje odgovaraju pretrazi",
         "top_title": "Nazad na vrh",
         "toc_count": "%d stavki",
+        "toc_show_all": "Prikaži sve",
+        "toc_hide_all": "Skupi sve",
         "src_one": "Izvori",
         "src_many": "Izvori (%d referenci)",
         "langs_aria": "Jezik",
@@ -638,10 +648,30 @@ strong{font-weight:600;color:var(--t1)}
 .shell{display:flex;align-items:flex-start}
 .toc{position:sticky;top:var(--bar);flex:none;width:var(--side);height:calc(100vh - var(--bar));
   overflow-y:auto;padding:18px 14px 80px 18px;background:var(--bg-alt);border-right:1px solid var(--divider)}
-.toc .gt{font-size:13px;font-weight:600;margin:0 0 6px;color:var(--t1);display:flex;justify-content:space-between;align-items:baseline}
+.toc .gt{width:100%;padding:2px 6px;margin:0 -6px 6px;border:0;background:none;border-radius:6px;
+  font:600 13px/1.6 var(--font);color:var(--t1);text-align:left;cursor:pointer;
+  display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.toc .gt:hover{color:var(--brand-1)}
+.toc .gt:focus-visible{outline:2px solid var(--brand-1);outline-offset:1px}
+.toc .gt::before{content:"▸";flex:none;font-size:10px;color:var(--t3);transition:transform .2s ease}
+@supports (content:"x"/""){.toc .gt::before{content:"▸"/""}}
+.toc .grp:not(.closed) .gt::before{transform:rotate(90deg)}
+.toc .gt .ttl{flex:1;min-width:0}
 .toc .gt small{font-weight:400;font-size:11px;color:var(--t3)}
 .toc .grp{padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--divider)}
-.toc .grp:last-child{border-bottom:0;margin-bottom:0}
+.toc .grp:last-of-type{border-bottom:0;margin-bottom:0}
+.toc .gl{display:grid;grid-template-rows:1fr;transition:grid-template-rows .25s ease}
+.toc .gl>.gli{min-height:0;overflow:hidden}
+.toc .grp.closed .gl{grid-template-rows:0fr}
+.toc .grp.closed .gl>.gli{visibility:hidden;transition:visibility 0s .25s}
+.toc .gall{display:block;width:100%;padding:5px 6px;border:0;border-radius:6px;background:none;
+  font:500 12px/1.6 var(--font);color:var(--t3);text-align:center;cursor:pointer}
+.toc .gall[hidden]{display:none}
+.toc .gall:hover{color:var(--brand-1)}
+.toc .gall:focus-visible{outline:2px solid var(--brand-1);outline-offset:1px}
+@media (prefers-reduced-motion:reduce){
+  .toc .gl,.toc .grp.closed .gl>.gli,.toc .gt::before{transition:none}
+}
 .toc a{display:flex;gap:6px;align-items:baseline;padding:3px 6px;border-radius:6px;font-size:12.5px;
   line-height:1.5;color:var(--t2)}
 .toc a:hover{background:var(--bg-elv);color:var(--t1);text-decoration:none}
@@ -807,6 +837,14 @@ function markAll(root,term){
 }
 function apply(){
   const term=q.value.trim().toLowerCase();
+  /* 搜索时把目录分组全部展开，否则折叠组里的过滤结果看不见；清空后恢复搜索前的状态 */
+  if(term&&!tocPre&&grps.length){
+    tocPre=grps.map(g=>!g.classList.contains('closed'));
+    grps.forEach(g=>setOpen(g,true));
+  }else if(!term&&tocPre){
+    grps.forEach((g,i)=>setOpen(g,tocPre[i]));
+    tocPre=null;
+  }
   clearMarks(document.querySelector('main'));
   let shown=0;
   cards.forEach(c=>{
@@ -890,11 +928,63 @@ if(document.fonts&&document.fonts.ready) document.fonts.ready.then(syncBar);
 syncBar();
 
 const links=[...document.querySelectorAll('.toc a')];
+/* ---- 目录手风琴：按分组折叠/展开 ----
+   默认只展开当前阅读位置所在的组；滚动进入新分组时自动换组（autoFollow）。
+   用户手动点过分组标题或“全部”按钮后，本次访问内不再自动换组；
+   锚点跳转（目录链接、前进/后退）始终展开目标所在的组。 */
+const grps=[...document.querySelectorAll('.toc .grp')];
+const gall=document.getElementById('gall');
+let autoFollow=true, tocPre=null;
+function allOpen(){ return grps.every(g=>!g.classList.contains('closed')); }
+function syncGall(){ if(gall) gall.textContent=allOpen()?L10N.collapseAll:L10N.showAll; }
+function setOpen(g,open){
+  g.classList.toggle('closed',!open);
+  const b=g.querySelector('.gt');
+  if(b) b.setAttribute('aria-expanded',String(open));
+  syncGall();
+}
+function openOnly(g){ grps.forEach(x=>setOpen(x,x===g)); }
+function groupFor(el){
+  const s=el.closest('section');
+  return s?document.querySelector('.toc .grp[data-sec="'+s.id.slice(3)+'"]'):null;
+}
+function openHashGroup(){
+  const h=location.hash;
+  if(!h||h.length<2) return false;
+  const el=document.getElementById(h.slice(1));
+  const g=el&&groupFor(el);
+  if(!g) return false;
+  setOpen(g,true);
+  return true;
+}
+grps.forEach(g=>{
+  const b=g.querySelector('.gt');
+  if(b) b.addEventListener('click',()=>{
+    autoFollow=false;
+    setOpen(g,g.classList.contains('closed'));
+  });
+});
+if(gall) gall.addEventListener('click',()=>{
+  autoFollow=false;
+  const open=!allOpen();
+  grps.forEach(g=>setOpen(g,open));
+});
+if(grps.length){
+  grps.forEach(g=>setOpen(g,false));
+  if(!openHashGroup()) setOpen(grps[0],true);
+  if(gall) gall.hidden=false;
+}
+addEventListener('hashchange',openHashGroup);
 const io=new IntersectionObserver(es=>{
   es.forEach(e=>{ if(e.isIntersecting){
-    if(e.target.classList.contains('card'))
+    if(e.target.classList.contains('card')){
       links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id));
-    else if(jump && e.target.tagName==='SECTION')
+      if(autoFollow&&!q.value.trim()){
+        const act=links.find(a=>a.getAttribute('href')==='#'+e.target.id);
+        const g=act&&act.closest('.grp');
+        if(g) openOnly(g);
+      }
+    }else if(jump && e.target.tagName==='SECTION')
       jump.value=e.target.id;
   }});
 },{rootMargin:'-70px 0px -75% 0px'});
@@ -926,13 +1016,15 @@ def count_line(spec, shown, total):
     return c[i].replace("%1", str(shown)).replace("%2", str(total))
 
 
-def page_js(count_fmt, filter_init="all"):
+def page_js(count_fmt, filter_init="all", toc_toggle=None):
     """Identical page logic for every language; only the count-line format
     string (or its plural forms) is localized (injected as the L10N
-    constant). A non-default filter_init appends one setMode() call so the
-    page opens with that filter active (EN ships with Grade A preselected);
-    the default leaves the emitted JS byte-identical to before. The cstr
-    rules mirror count_line() — keep them in sync."""
+    constant), plus the TOC show-all/collapse-all labels when toc_toggle is
+    given as a (show_all, collapse_all) pair. A non-default filter_init
+    appends one setMode() call so the page opens with that filter active
+    (EN ships with Grade A preselected); the default leaves the emitted JS
+    byte-identical to before. The cstr rules mirror count_line() — keep them
+    in sync."""
     forms = json.dumps(count_fmt, ensure_ascii=False)
     if isinstance(count_fmt, str):
         l10n = "const L10N={count:%s};\nconst cstr=n=>L10N.count;\n" % forms
@@ -942,6 +1034,10 @@ def page_js(count_fmt, filter_init="all"):
         l10n = ("const L10N={count:%s};\n"
                 "const cstr=n=>{const m=n%%10,u=n%%100;"
                 "return L10N.count[(m===1&&u!==11)?0:(m>=2&&m<=4&&(u<12||u>14))?1:2];};\n" % forms)
+    if toc_toggle:
+        l10n += ("L10N.showAll=%s;L10N.collapseAll=%s;\n"
+                 % (json.dumps(toc_toggle[0], ensure_ascii=False),
+                    json.dumps(toc_toggle[1], ensure_ascii=False)))
     init = ("" if filter_init == "all"
             else "setMode(%s);\n" % json.dumps(filter_init, ensure_ascii=False))
     return l10n + JS_CORE + LANGS_JS + init
@@ -1038,8 +1134,11 @@ def build_lang(lang, sections, out=None, built=None):
                          '<i>%d</i><span>%s</span></a>'
                          % (n, e["no"], html.escape(e["title"], quote=True),
                             TIER_ORDER.get(r, 2), e["no"], html.escape(short)))
-        sec_toc.append('<div class="grp"><div class="gt">%s<small>%s</small></div>%s</div>'
-                       % (inline(title), spec["toc_count"] % len(entries), "".join(links)))
+        sec_toc.append('<div class="grp" data-sec="%d">'
+                       '<button class="gt" type="button" aria-expanded="true" aria-controls="tocg%d">'
+                       '<span class="ttl">%s</span><small>%s</small></button>'
+                       '<div class="gl" id="tocg%d"><div class="gli">%s</div></div></div>'
+                       % (n, n, inline(title), spec["toc_count"] % len(entries), n, "".join(links)))
         sec_html.append(
             '<section id="sec%d"><div class="sec-h"><h2>%s</h2>'
             '<span class="meta">%s</span></div>%s%s</section>'
@@ -1093,14 +1192,16 @@ def build_lang(lang, sections, out=None, built=None):
         foot += "<br>" + spec["foot_translated"]
     footer = "<footer>%s</footer>" % foot
 
-    shell = ('<div class="shell"><aside class="toc">%s</aside><main>%s'
+    shell = ('<div class="shell"><aside class="toc">%s'
+             '<button class="gall" id="gall" type="button" hidden>%s</button></aside><main>%s'
              '<div class="empty hidden" id="empty">%s</div>%s'
              '</main></div>'
              '<button id="top" title="%s" aria-label="%s">↑</button>'
-             % ("".join(sec_toc), "".join(sec_html), html.escape(spec["empty"]), footer,
+             % ("".join(sec_toc), html.escape(spec["toc_show_all"]), "".join(sec_html), html.escape(spec["empty"]), footer,
                 html.escape(spec["top_title"]), html.escape(spec["top_title"])))
 
-    out_html = head + bar + shell + "<script>" + page_js(spec["count_js"], spec.get("filter_init", "all")) + "</script></body></html>"
+    out_html = head + bar + shell + "<script>" + page_js(spec["count_js"], spec.get("filter_init", "all"),
+                                                        (spec["toc_show_all"], spec["toc_hide_all"])) + "</script></body></html>"
 
     if out:
         name = Path(out)

@@ -119,7 +119,9 @@ phrases, search placeholder, the three filter buttons, theme button, empty
 state, count format (a single string, or a plural-form list — a 2-form
 `[one, other]` list selected by n == 1 for German, a 3-form
 `[one, few, many]` list with the Slavic 11-14 exception for Russian and
-Serbian; see `count_line` in build.py), footer attribution (keep the upstream + CC BY 4.0 + renderer credits + translation notice), meta description.
+Serbian; see `count_line` in build.py), the TOC show-all/collapse-all
+labels (`toc_show_all`/`toc_hide_all`, used by the collapsible sidebar
+groups), footer attribution (keep the upstream + CC BY 4.0 + renderer credits + translation notice), meta description.
 `html_lang` must be set (the shipped entries use `de`, `ru`, `sr`).
 
 ## Workflow checklist for a new language
