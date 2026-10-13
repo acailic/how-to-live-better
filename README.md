@@ -68,6 +68,7 @@ content/
   de/NN-*.md ru/NN-*.md sr/NN-*.md   German, Russian, Serbian translations
 index.html                landing: language selection + auto-redirect
 zh/ en/ de/ ru/ sr/ index.html      generated pages (committed)
+sitemap.xml robots.txt   generated sitemap + robots for the published site
 GLOSSARY.md               canonical terminology table (all languages)
 TRANSLATING.md            how to translate a new language / refresh the snapshot
 tools/check_translation.py  verifies grade/tag/link/number parity vs zh

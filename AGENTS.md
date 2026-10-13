@@ -14,10 +14,11 @@ When updating this file, preserve this bar for all agents and keep entries conci
 ## Merging parallel translation branches
 
 Parallel per-language branches (one LANGS entry each) conflict mechanically in
-`build.py` (LANGS block), `GLOSSARY.md` (end-of-file appends), and the generated
-`*/index.html`. Resolution: keep every language's LANGS entry intact (dict order
+`build.py` (LANGS block), `GLOSSARY.md` (end-of-file appends), and the generated `*/index.html`
+(and `sitemap.xml`/`robots.txt`, same rule). Resolution: keep every language's LANGS
+entry intact (dict order
 zh, en, then new languages in merge order), concatenate glossary sections, take
-either side of generated HTML, then run `python3 build.py` to regenerate all
+either side of generated files, then run `python3 build.py` to regenerate all
 outputs canonically. Parity gate: `python3 tools/check_translation.py <lang>`
 must report 0 problems (digit warnings are a known Chinese-numeral class).
 

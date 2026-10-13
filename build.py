@@ -32,6 +32,10 @@ CONTENT = HERE / "content"
 UPSTREAM = "https://github.com/eternity4719/HowToLiveBetter"
 RENDERER = "https://github.com/cdyforever/how-to-live-better"
 CC_BY = "https://creativecommons.org/licenses/by/4.0/"
+# Published origin: canonical URLs, og:url and the sitemap/robots entries all
+# point here (GitHub Pages). No trailing slash — callers append their paths.
+SITE_URL = "https://acailic.github.io/how-to-live-better"
+SITE_NAME = "How to Live Better"  # og:site_name, identical on every page
 
 
 # ---------------------------------------------------------------- vendor pin
@@ -88,6 +92,7 @@ LANGS = {
     "zh": {
         "label": "中文",
         "html_lang": "zh-CN",
+        "og_locale": "zh_CN",
         "book_title": "高性价比人生指南",
         # keywords used in this language's .md files -> canonical field keys
         "fields_kw": {"成本": "cost", "说人话": "plain", "收益": "benefit",
@@ -154,6 +159,7 @@ LANGS = {
     "en": {
         "label": "English",
         "html_lang": "en",
+        "og_locale": "en_US",
         "book_title": "How to Live Better",
         "fields_kw": {"Cost": "cost", "In plain terms": "plain", "Benefit": "benefit",
                       "Evidence grade": "evidence", "Sources": "source", "Note": "note"},
@@ -223,6 +229,7 @@ LANGS = {
     "de": {
         "label": "Deutsch",
         "html_lang": "de",
+        "og_locale": "de_DE",
         "book_title": "Besser leben",
         "fields_kw": {"Kosten": "cost", "Klartext": "plain", "Nutzen": "benefit",
                       "Evidenzgrad": "evidence", "Quellen": "source", "Hinweis": "note"},
@@ -289,6 +296,7 @@ LANGS = {
     "ru": {
         "label": "Русский",
         "html_lang": "ru",
+        "og_locale": "ru_RU",
         "book_title": "Как жить лучше",
         "fields_kw": {"Затраты": "cost", "Простыми словами": "plain", "Польза": "benefit",
                       "Уровень доказательности": "evidence", "Источники": "source", "Примечание": "note"},
@@ -355,6 +363,7 @@ LANGS = {
     "sr": {
         "label": "Srpski",
         "html_lang": "sr",
+        "og_locale": "sr_Latn",  # Serbian edition is written in Latin script
         "book_title": "Kako živeti bolje",
         "fields_kw": {"Trošak": "cost", "Prostim jezikom": "plain", "Korist": "benefit",
                       "Nivo dokaza": "evidence", "Izvori": "source", "Napomena": "note"},
@@ -1152,14 +1161,26 @@ def build_lang(lang, sections, out=None, built=None):
     scope = ((spec["scope_all"] % len(all_secs)) if sections == all_secs
              else spec["scope_sel"] % ", ".join(str(n) for n in sections))
 
+    desc = spec["meta_desc"] % (scope, total)
+    canonical = "%s/%s/" % (SITE_URL, lang)
     head = ('<!DOCTYPE html><html lang="%s" data-theme="light"><head><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
             '<meta name="color-scheme" content="light dark">'
             '<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">'
             '<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1b1b1f">'
             '<meta name="description" content="%s">%s'
+            '<link rel="canonical" href="%s">'
+            '<meta property="og:title" content="%s · %s">'
+            '<meta property="og:description" content="%s">'
+            '<meta property="og:type" content="website">'
+            '<meta property="og:url" content="%s">'
+            '<meta property="og:locale" content="%s">'
+            '<meta property="og:site_name" content="%s">'
+            '<meta name="twitter:card" content="summary">'
             '<title>%s · %s</title><style>%s</style></head><body>'
-            % (spec["html_lang"], html.escape(spec["meta_desc"] % (scope, total), quote=True), FAVICON,
+            % (spec["html_lang"], html.escape(desc, quote=True), FAVICON,
+               canonical, html.escape(spec["book_title"]), html.escape(scope),
+               html.escape(desc, quote=True), canonical, spec["og_locale"], SITE_NAME,
                html.escape(spec["book_title"]), html.escape(scope), CSS))
 
     bar = ('<header class="bar"><h1>%s<small>%s</small></h1>'
@@ -1267,13 +1288,23 @@ def build_landing(built, entry_total, section_total):
     if rev:
         foot += ' Snapshot <span style="font-family:ui-monospace,monospace">%s</span>%s.' % (
             rev, (" (%s)" % rev_date) if rev_date else "")
+    desc = ("How to Live Better (《高性价比人生指南》) — a cost-effectiveness guide to life. "
+            "%d sections, %d recommendations, each with costs, benefits, an evidence grade (A/B/C) "
+            "and links to the research. Multiple languages, single-file pages, readable offline."
+            % (section_total, entry_total))
+    canonical = SITE_URL + "/"
     page = ('<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
             '<meta name="color-scheme" content="light dark">'
-            '<meta name="description" content="How to Live Better (《高性价比人生指南》) — '
-            'a cost-effectiveness guide to life. %d sections, %d recommendations, each with costs, '
-            'benefits, an evidence grade (A/B/C) and links to the research. Multiple languages, '
-            'single-file pages, readable offline.">%s'
+            '<meta name="description" content="%s">%s'
+            '<link rel="canonical" href="%s">'
+            '<meta property="og:title" content="How to Live Better · 高性价比人生指南">'
+            '<meta property="og:description" content="%s">'
+            '<meta property="og:type" content="website">'
+            '<meta property="og:url" content="%s">'
+            '<meta property="og:locale" content="en_US">'
+            '<meta property="og:site_name" content="%s">'
+            '<meta name="twitter:card" content="summary">'
             '<title>How to Live Better · 高性价比人生指南</title>'
             '<style>%s</style></head><body><main>'
             '<h1>How to Live Better<span lang="zh">高性价比人生指南</span></h1>'
@@ -1290,11 +1321,29 @@ def build_landing(built, entry_total, section_total):
             'for(var i=0;i<p.length;i++){var q=(p[i]||\'\').toLowerCase().split(\'-\')[0];'
             'if(LANGS.indexOf(q)>=0)return go(q);}}catch(e){}go(\'en\');})();</script>'
             '</body></html>'
-            % (section_total, entry_total, FAVICON, LANDING_CSS, section_total, entry_total,
+            % (html.escape(desc, quote=True), FAVICON, canonical,
+               html.escape(desc, quote=True), canonical, SITE_NAME, LANDING_CSS,
+               section_total, entry_total,
                "".join(items), foot, codes))
     (HERE / "index.html").write_text(page, encoding="utf-8")
     print("[landing] %d languages -> index.html (%d bytes)"
           % (len(built), len(page.encode("utf-8"))))
+
+
+def build_sitemap(present):
+    """Write sitemap.xml (the landing plus every published language page) and
+    robots.txt at the site root. Plain <loc> entries in LANGS order, mirroring
+    the committed single-file pages; no lastmod so rebuilds stay byte-identical.
+    """
+    urls = [SITE_URL + "/"] + ["%s/%s/" % (SITE_URL, c) for c in present]
+    sitemap = ('<?xml version="1.0" encoding="UTF-8"?>\n'
+               '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+               + "".join("  <url><loc>%s</loc></url>\n" % u for u in urls)
+               + "</urlset>\n")
+    (HERE / "sitemap.xml").write_text(sitemap, encoding="utf-8")
+    (HERE / "robots.txt").write_text(
+        "User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n" % SITE_URL, encoding="utf-8")
+    print("[sitemap] %d urls -> sitemap.xml, robots.txt" % len(urls))
 
 
 def main():
@@ -1323,6 +1372,7 @@ def main():
             _, _, entries = parse(find_file(src_lang, n), field_re, kw2canon)
             total += len(entries)
         build_landing(present, total, len(avail_sections(src_lang)))
+        build_sitemap(present)
         return
 
     if args.lang not in LANGS:
