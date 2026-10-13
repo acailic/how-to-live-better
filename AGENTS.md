@@ -27,3 +27,15 @@ must report 0 problems (digit warnings are a known Chinese-numeral class).
 excludes `build.py` and `tools/check_translation.py` (hand-wrapped compact style a
 Black-style formatter cannot reproduce) and pins `line-length = 100` for any future
 Python file. Do not reformat the two excluded files; do not widen the exclusion.
+
+## Verified TODO resolutions in content (2026-10-13 pass)
+
+The zh snapshot was deliberately edited (captain-authorized pass) to resolve the
+three TODO verification notes in ch 06 item 20, ch 20 item 10, ch 31 item 6 —
+zh+sr notes rewritten, en/de/ru got only the new source URLs (their TODO note
+text is still pending translation). A future upstream snapshot refresh per
+TRANSLATING.md will clobber these fixes: re-check the three notes after any
+refresh and re-apply or re-verify. Sources added in that pass:
+tyjrswj.yibin.gov.cn (2026-09-17 policy Q&A, 4,500 yuan/year),
+lcgdbzz.org (full-text repost of the 2021 gallbladder consensus),
+news.china.com/海报新闻 (2026-10-12, diaper-probe non-disclosure).
