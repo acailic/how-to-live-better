@@ -1168,7 +1168,8 @@ def build_lang(lang, sections, out=None, built=None):
             '<meta name="color-scheme" content="light dark">'
             '<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">'
             '<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1b1b1f">'
-            '<meta name="description" content="%s">%s'
+            '<meta name="description" content="%s">'
+            '<link rel="license" href="%s">%s'
             '<link rel="canonical" href="%s">'
             '<meta property="og:title" content="%s · %s">'
             '<meta property="og:description" content="%s">'
@@ -1178,7 +1179,7 @@ def build_lang(lang, sections, out=None, built=None):
             '<meta property="og:site_name" content="%s">'
             '<meta name="twitter:card" content="summary">'
             '<title>%s · %s</title><style>%s</style></head><body>'
-            % (spec["html_lang"], html.escape(desc, quote=True), FAVICON,
+            % (spec["html_lang"], html.escape(desc, quote=True), CC_BY, FAVICON,
                canonical, html.escape(spec["book_title"]), html.escape(scope),
                html.escape(desc, quote=True), canonical, spec["og_locale"], SITE_NAME,
                html.escape(spec["book_title"]), html.escape(scope), CSS))
@@ -1296,7 +1297,8 @@ def build_landing(built, entry_total, section_total):
     page = ('<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
             '<meta name="color-scheme" content="light dark">'
-            '<meta name="description" content="%s">%s'
+            '<meta name="description" content="%s">'
+            '<link rel="license" href="%s">%s'
             '<link rel="canonical" href="%s">'
             '<meta property="og:title" content="How to Live Better · 高性价比人生指南">'
             '<meta property="og:description" content="%s">'
@@ -1321,7 +1323,7 @@ def build_landing(built, entry_total, section_total):
             'for(var i=0;i<p.length;i++){var q=(p[i]||\'\').toLowerCase().split(\'-\')[0];'
             'if(LANGS.indexOf(q)>=0)return go(q);}}catch(e){}go(\'en\');})();</script>'
             '</body></html>'
-            % (html.escape(desc, quote=True), FAVICON, canonical,
+            % (html.escape(desc, quote=True), CC_BY, FAVICON, canonical,
                html.escape(desc, quote=True), canonical, SITE_NAME, LANDING_CSS,
                section_total, entry_total,
                "".join(items), foot, codes))
