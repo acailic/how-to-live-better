@@ -2,7 +2,7 @@
   "name": "htlb-toc-tests",
   "private": true,
   "type": "module",
-  "description": "jsdom tests for the collapsible TOC (groups + reading-position auto-follow) in the built pages",
+  "description": "jsdom tests for the collapsible TOC (groups + reading-position auto-follow) and the dark-mode theme (system preference + remembered manual toggle) in the built pages",
   "scripts": {
     "test": "node --test"
   },
