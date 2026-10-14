@@ -33,11 +33,24 @@ Python file. Do not reformat the two excluded files; do not widen the exclusion.
 
 `cd tests && npm install && npm test` (Node >= 18, jsdom) covers the collapsible TOC:
 group/section coverage per language, reading-position auto-follow, mutation
-canaries, and a seeded stress walk. Tests run against the **committed build
-artifacts** (`<lang>/index.html`), not build.py output — rebuild and commit
-before testing after content/build changes. Mutation tests pin exact `JS_CORE`
-source strings; renaming those in build.py fails them loudly so they get
-updated in the same change. See tests/README.md.
+canaries, a seeded stress walk, and the dark-mode theme (boot order, OS
+preference, toggle persistence — see `tests/theme-toggle.test.mjs`). Tests run
+against the **committed build artifacts** (`<lang>/index.html`), not build.py
+output — rebuild and commit before testing after content/build changes.
+Mutation tests pin exact `JS_CORE` source strings; renaming those in build.py
+fails them loudly so they get updated in the same change. See tests/README.md.
+
+## Dark-mode theme architecture
+
+Theming is JS-driven: `<html data-theme="light">` is the static default, the
+`THEME_BOOT` inline script in build.py runs in `<head>` **before `<style>`**
+(stored `hltb-theme` wins over `prefers-color-scheme`; without a stored choice
+the page follows the OS, live), and JS_CORE only owns the `#theme` toggle.
+Palettes live in the CSS custom-property blocks (`:root` / `[data-theme=dark]`
+in CSS and LANDING_CSS). Tertiary text `--t3` is pinned to WCAG AA (≥4.5:1 on
+its worst surface): keep light `.75` / dark `.54` alpha or re-audit —
+`tests/theme-toggle.test.mjs` does not check contrast, so palette edits need
+a manual pass.
 
 ## Verified TODO resolutions in content (2026-10-13 pass)
 

@@ -1,9 +1,10 @@
-# TOC tests (jsdom)
+# Page tests (jsdom)
 
 Covers the collapsible table of contents with reading-position auto-follow
-in the built pages (`<lang>/index.html`): group/section coverage, the
-auto-follow state machine, and mutation checks proving the suite fails when
-the interception logic is broken.
+and the dark-mode theme (system preference + remembered manual toggle) in
+the built pages (`<lang>/index.html`): group/section coverage, the
+auto-follow state machine, mutation checks proving the suite fails when
+the interception logic is broken, and theme boot/toggle/persistence.
 
 ## Run
 
@@ -32,6 +33,12 @@ cd tests && npm install && npm test      # node --test, Node >= 18
   all interactions with full invariant checks after every step, plus
   forward/backward/shuffled sweeps. Deterministic seed; bump
   `SEED`/`ITERATIONS` locally for a harder soak.
+- `theme-toggle.test.mjs` — dark mode: per language the `#theme` toggle
+  ships with a localized aria-label and the `THEME_BOOT` script sits in
+  `<head>` before `<style>` (no flash of light for dark readers); runtime
+  tests cover OS-preference detection via a scriptable `matchMedia` stub,
+  stored choice beating the OS, toggle persistence, reload carry-over, and
+  live OS theme changes. Landing page included.
 
 ## Contract
 

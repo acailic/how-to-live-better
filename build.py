@@ -595,7 +595,7 @@ CSS = r"""
 :root{
   --bg:#ffffff;--bg-alt:#f6f6f7;--bg-elv:#ffffff;--bg-mute:#f1f1f2;
   --divider:#e2e2e3;
-  --t1:rgba(60,60,67,1);--t2:rgba(60,60,67,.78);--t3:rgba(60,60,67,.56);
+  --t1:rgba(60,60,67,1);--t2:rgba(60,60,67,.78);--t3:rgba(60,60,67,.75);
   --brand-1:#3451b2;--brand-2:#3a5ccc;--brand-soft:rgba(100,108,255,.12);
   --green-1:#18794e;--green-soft:rgba(16,185,129,.13);
   --yellow-1:#915930;--yellow-soft:rgba(234,179,8,.15);
@@ -609,7 +609,7 @@ CSS = r"""
 [data-theme=dark]{
   --bg:#1b1b1f;--bg-alt:#161618;--bg-elv:#202127;--bg-mute:#2b2b2f;
   --divider:#2e2e32;
-  --t1:rgba(255,255,245,.88);--t2:rgba(235,235,245,.62);--t3:rgba(235,235,245,.4);
+  --t1:rgba(255,255,245,.88);--t2:rgba(235,235,245,.62);--t3:rgba(235,235,245,.54);
   --brand-1:#a8b1ff;--brand-2:#c3c9ff;--brand-soft:rgba(100,108,255,.18);
   --green-1:#3dd68c;--green-soft:rgba(16,185,129,.16);
   --yellow-1:#f9b44e;--yellow-soft:rgba(234,179,8,.16);
@@ -792,6 +792,23 @@ footer a{color:var(--t2)}
 }
 """
 
+# Tiny theme boot, emitted as an inline <head> script BEFORE the stylesheet
+# so the very first paint already carries the right theme — dark readers get
+# no white flash. Manual choice (localStorage 'hltb-theme') always wins;
+# without one the OS preference applies, and the page keeps following it live
+# until the reader toggles manually. Mirrors the toggle in JS_CORE.
+THEME_BOOT = (
+    "(function(){var d=document.documentElement;"
+    "try{var t=localStorage.getItem('hltb-theme');"
+    "if(t)d.setAttribute('data-theme',t);"
+    "else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)"
+    "d.setAttribute('data-theme','dark');}catch(e){}"
+    "try{var mq=window.matchMedia('(prefers-color-scheme: dark)');"
+    "if(mq&&mq.addEventListener)mq.addEventListener('change',function(ev){"
+    "try{if(!localStorage.getItem('hltb-theme'))"
+    "d.setAttribute('data-theme',ev.matches?'dark':'light');}catch(_){}});}catch(e){}})();"
+)
+
 JS_CORE = r"""
 const cards=[...document.querySelectorAll('.card')];
 const secs=[...document.querySelectorAll('section')];
@@ -901,16 +918,12 @@ if(jump){
   });
 }
 themeBtn.onclick=()=>{
+  /* initial theme is applied by the THEME_BOOT head script; here we only
+     toggle and persist the reader's manual choice */
   const cur=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
   document.documentElement.setAttribute('data-theme',cur);
   try{localStorage.setItem('hltb-theme',cur);}catch(e){}
 };
-try{
-  const t=localStorage.getItem('hltb-theme');
-  if(t) document.documentElement.setAttribute('data-theme',t);
-  else if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)
-    document.documentElement.setAttribute('data-theme','dark');
-}catch(e){}
 document.addEventListener('keydown',e=>{
   if(e.key==='/'&&document.activeElement!==q&&!/^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName)){
     e.preventDefault();q.focus();
@@ -1178,11 +1191,11 @@ def build_lang(lang, sections, out=None, built=None):
             '<meta property="og:locale" content="%s">'
             '<meta property="og:site_name" content="%s">'
             '<meta name="twitter:card" content="summary">'
-            '<title>%s · %s</title><style>%s</style></head><body>'
+            '<title>%s · %s</title><script>%s</script><style>%s</style></head><body>'
             % (spec["html_lang"], html.escape(desc, quote=True), CC_BY, FAVICON,
                canonical, html.escape(spec["book_title"]), html.escape(scope),
                html.escape(desc, quote=True), canonical, spec["og_locale"], SITE_NAME,
-               html.escape(spec["book_title"]), html.escape(scope), CSS))
+               html.escape(spec["book_title"]), html.escape(scope), THEME_BOOT, CSS))
 
     bar = ('<header class="bar"><h1>%s<small>%s</small></h1>'
            '<select class="jump" id="jump" aria-label="%s">%s</select>'
@@ -1242,11 +1255,11 @@ def build_lang(lang, sections, out=None, built=None):
 
 LANDING_CSS = r"""
 *,*::before,*::after{box-sizing:border-box}
-:root{--bg:#ffffff;--divider:#e2e2e3;--t1:rgba(60,60,67,1);--t2:rgba(60,60,67,.78);--t3:rgba(60,60,67,.56);
+:root{--bg:#ffffff;--divider:#e2e2e3;--t1:rgba(60,60,67,1);--t2:rgba(60,60,67,.78);--t3:rgba(60,60,67,.75);
   --brand-1:#3451b2;--brand-2:#3a5ccc;--brand-soft:rgba(100,108,255,.12);
   --font:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif}
 [data-theme=dark]{--bg:#1b1b1f;--divider:#2e2e32;--t1:rgba(255,255,245,.88);--t2:rgba(235,235,245,.62);
-  --t3:rgba(235,235,245,.4);--brand-1:#a8b1ff;--brand-2:#c3c9ff;--brand-soft:rgba(100,108,255,.18)}
+  --t3:rgba(235,235,245,.54);--brand-1:#a8b1ff;--brand-2:#c3c9ff;--brand-soft:rgba(100,108,255,.18)}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--t1);font:16px/1.8 var(--font);
   -webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
@@ -1308,15 +1321,12 @@ def build_landing(built, entry_total, section_total):
             '<meta property="og:site_name" content="%s">'
             '<meta name="twitter:card" content="summary">'
             '<title>How to Live Better · 高性价比人生指南</title>'
-            '<style>%s</style></head><body><main>'
+            '<script>%s</script><style>%s</style></head><body><main>'
             '<h1>How to Live Better<span lang="zh">高性价比人生指南</span></h1>'
             '<p>A cost-effectiveness guide to life: %d sections, %d recommendations, each spelling '
             'out what it costs you, what it gets you, and how solid the evidence is. Pick a language:</p>'
             '<ul>%s</ul></main><footer>%s</footer>'
-            '<script>var LANGS=%s;(function(){var d=document.documentElement;'
-            'try{var t=localStorage.getItem(\'hltb-theme\');if(t)d.setAttribute(\'data-theme\',t);'
-            'else if(window.matchMedia&&window.matchMedia(\'(prefers-color-scheme: dark)\').matches)'
-            'd.setAttribute(\'data-theme\',\'dark\');}catch(e){}'
+            '<script>var LANGS=%s;(function(){'
             'function go(c){location.replace(c+\'/\');}'
             'try{var s=localStorage.getItem(\'hltb-lang\');if(s&&LANGS.indexOf(s)>=0)return go(s);'
             'var p=navigator.languages||[navigator.language||\'en\'];'
@@ -1324,7 +1334,7 @@ def build_landing(built, entry_total, section_total):
             'if(LANGS.indexOf(q)>=0)return go(q);}}catch(e){}go(\'en\');})();</script>'
             '</body></html>'
             % (html.escape(desc, quote=True), CC_BY, FAVICON, canonical,
-               html.escape(desc, quote=True), canonical, SITE_NAME, LANDING_CSS,
+               html.escape(desc, quote=True), canonical, SITE_NAME, THEME_BOOT, LANDING_CSS,
                section_total, entry_total,
                "".join(items), foot, codes))
     (HERE / "index.html").write_text(page, encoding="utf-8")
