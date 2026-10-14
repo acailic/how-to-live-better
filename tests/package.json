@@ -1,0 +1,15 @@
+{
+  "name": "htlb-toc-tests",
+  "private": true,
+  "type": "module",
+  "description": "jsdom tests for the collapsible TOC (groups + reading-position auto-follow) in the built pages",
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "jsdom": "^30.1.2"
+  }
+}
