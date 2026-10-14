@@ -29,6 +29,16 @@ excludes `build.py` and `tools/check_translation.py` (hand-wrapped compact style
 Black-style formatter cannot reproduce) and pins `line-length = 100` for any future
 Python file. Do not reformat the two excluded files; do not widen the exclusion.
 
+## JS test suite (tests/)
+
+`cd tests && npm install && npm test` (Node >= 18, jsdom) covers the collapsible TOC:
+group/section coverage per language, reading-position auto-follow, mutation
+canaries, and a seeded stress walk. Tests run against the **committed build
+artifacts** (`<lang>/index.html`), not build.py output — rebuild and commit
+before testing after content/build changes. Mutation tests pin exact `JS_CORE`
+source strings; renaming those in build.py fails them loudly so they get
+updated in the same change. See tests/README.md.
+
 ## Verified TODO resolutions in content (2026-10-13 pass)
 
 The zh snapshot was deliberately edited (captain-authorized pass) to resolve the
